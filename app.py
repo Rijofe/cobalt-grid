@@ -3,19 +3,16 @@
 # Ponto de entrada do app. Roda com: streamlit run app.py
 # ------------------------------------------------------------
 
-from pathlib import Path
-
 import streamlit as st
-from data.csv_loader import carrega_csv, gera_exemplo_csv
+import datetime
 from data.tickers import INDICES, UNIVERSOS
-from engine.loader import index_performance, load_prices
+from data.csv_loader import carrega_csv, gera_exemplo_csv
+from pathlib import Path
+from engine.loader import load_prices, load_index_only, index_performance
 from engine.rs_calc import (
-    DEFAULT_MOM_WINDOW,
-    DEFAULT_NEUTRAL_BAND,
-    DEFAULT_RS_WINDOW,
-    DEFAULT_ZSCORE_LOOKBACK,
-    compute_breadth,
-    compute_quadrants,
+    DEFAULT_RS_WINDOW, DEFAULT_MOM_WINDOW,
+    DEFAULT_ZSCORE_LOOKBACK, DEFAULT_SMOOTHING, DEFAULT_NEUTRAL_BAND,
+    compute_quadrants, compute_breadth,
 )
 
 st.set_page_config(
@@ -33,9 +30,10 @@ with st.sidebar:
 
     st.markdown("#### Universo de ativos")
 
+    # Detecta CSVs na pasta data/
     DATA_DIR = Path(__file__).parent / "data"
     csvs_encontrados = sorted(DATA_DIR.glob("*.csv"))
-    csv_opcoes = {f.stem: f for f in csvs_encontrados}
+    csv_opcoes = {f.stem: f for f in csvs_encontrados}  # nome sem extensão → path
 
     SEPARADOR = "─────────────────────"
     OPCAO_UPLOAD = "📂  Upload de CSV..."
@@ -53,13 +51,14 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
+    # Upload avulso
     tickers_csv = None
     if universo == OPCAO_UPLOAD:
         uploaded = st.file_uploader(
             "Upload CSV (ticker, nome)",
             type=["csv"],
             help="Colunas: ticker (obrigatório) e nome (opcional). "
-            "Tickers BR sem .SA são normalizados automaticamente.",
+                 "Tickers BR sem .SA são normalizados automaticamente.",
         )
         st.download_button(
             "⬇ Baixar modelo CSV",
@@ -119,7 +118,7 @@ with st.sidebar:
         value=DEFAULT_NEUTRAL_BAND,
         step=0.1,
         format="%.1f",
-        help="Threshold do z-score que sepera as zonas UP / NEUTRO / DOWN.",
+        help="Threshold do z-score que separa as zonas UP / NEUTRO / DOWN.",
     )
 
     with st.expander("ℹ️ Sobre os parâmetros"):
@@ -202,30 +201,63 @@ params = dict(
 
 if "Quadrantes" in slide:
     from views.quadrant_view import render
-
     render(**params)
 
 elif "Breadth" in slide:
     from views.breadth_view import render
-
     render(**params)
 
 elif "Líderes" in slide:
     from views.leaders_view import render
-
     render(**params)
 
 elif "Individual" in slide:
     from views.ticker_view import render
-
     render(**params)
 
 elif "Histórico" in slide:
     from views.history_view import render
-
     render(**params)
 
 elif "Scanner" in slide:
     from views.scanner_view import render
-
     render(**params)
+
+# ── Exportação ────────────────────────────────────────────────
+with st.sidebar:
+    st.divider()
+    st.markdown("#### Exportar slide atual")
+    if st.button("⬇ Gerar PNG + PDF", use_container_width=True):
+        from views.export_utils import exporta_quadrantes, exporta_scanner, exporta_lideres
+        with st.spinner("Gerando exportação..."):
+            try:
+                if "Quadrantes" in slide:
+                    exp_params = dict(rs_window=rs_window, mom_window=mom_window)
+                    png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params)
+                    label = "quadrantes"
+                elif "Scanner" in slide:
+                    from views.scanner_view import _scan, BUY_TRANSITIONS, SELL_TRANSITIONS
+                    resultados = _scan(df, prices, index_series, tickers_dict, 10,
+                                      rs_window, mom_window, smoothing, neutral_band, False)
+                    compras = resultados[resultados["tipo"] == "compra"] if not resultados.empty else pd.DataFrame()
+                    vendas  = resultados[resultados["tipo"] == "venda"]  if not resultados.empty else pd.DataFrame()
+                    png, pdf = exporta_scanner(compras, vendas, indice_nome, 10)
+                    label = "scanner"
+                elif "Líderes" in slide:
+                    png, pdf = exporta_lideres(df, indice_nome)
+                    label = "lideres_laggards"
+                else:
+                    st.warning("Exportação disponível para: Quadrantes, Líderes e Scanner.")
+                    png, pdf = None, None
+                    label = ""
+
+                if png and pdf:
+                    data_str = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+                    st.download_button("⬇ Baixar PNG", data=png,
+                                       file_name=f"{data_str}_{label}.png",
+                                       mime="image/png", key="dl_png")
+                    st.download_button("⬇ Baixar PDF", data=pdf,
+                                       file_name=f"{data_str}_{label}.pdf",
+                                       mime="application/pdf", key="dl_pdf")
+            except Exception as e:
+                st.error(f"Erro na exportação: {e}")
