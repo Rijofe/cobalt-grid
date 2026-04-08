@@ -227,37 +227,59 @@ elif "Scanner" in slide:
 with st.sidebar:
     st.divider()
     st.markdown("#### Exportar slide atual")
-    if st.button("⬇ Gerar PNG + PDF", use_container_width=True):
-        from views.export_utils import exporta_quadrantes, exporta_scanner, exporta_lideres
-        with st.spinner("Gerando exportação..."):
-            try:
-                if "Quadrantes" in slide:
-                    exp_params = dict(rs_window=rs_window, mom_window=mom_window)
-                    png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params)
-                    label = "quadrantes"
-                elif "Scanner" in slide:
-                    from views.scanner_view import _scan, BUY_TRANSITIONS, SELL_TRANSITIONS
-                    resultados = _scan(df, prices, index_series, tickers_dict, 10,
-                                      rs_window, mom_window, smoothing, neutral_band, False)
-                    compras = resultados[resultados["tipo"] == "compra"] if not resultados.empty else pd.DataFrame()
-                    vendas  = resultados[resultados["tipo"] == "venda"]  if not resultados.empty else pd.DataFrame()
-                    png, pdf = exporta_scanner(compras, vendas, indice_nome, 10)
-                    label = "scanner"
-                elif "Líderes" in slide:
-                    png, pdf = exporta_lideres(df, indice_nome)
-                    label = "lideres_laggards"
-                else:
-                    st.warning("Exportação disponível para: Quadrantes, Líderes e Scanner.")
-                    png, pdf = None, None
-                    label = ""
 
-                if png and pdf:
+    slides_com_export = ("Quadrantes", "Líderes", "Scanner")
+    slide_ok = any(s in slide for s in slides_com_export)
+
+    if not slide_ok:
+        st.caption("Exportação disponível nos slides: Quadrantes, Líderes e Scanner.")
+    else:
+        col_e1, col_e2 = st.columns(2)
+
+        def _gera_exports():
+            from views.export_utils import exporta_quadrantes, exporta_scanner, exporta_lideres
+            if "Quadrantes" in slide:
+                exp_params = dict(rs_window=rs_window, mom_window=mom_window)
+                png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params)
+                label = "quadrantes"
+            elif "Scanner" in slide:
+                from views.scanner_view import _scan
+                resultados = _scan(df, prices, index_series, tickers_dict, 10,
+                                   rs_window, mom_window, smoothing, neutral_band, False)
+                compras = resultados[resultados["tipo"] == "compra"] if not resultados.empty else pd.DataFrame()
+                vendas  = resultados[resultados["tipo"] == "venda"]  if not resultados.empty else pd.DataFrame()
+                png, pdf = exporta_scanner(compras, vendas, indice_nome, 10)
+                label = "scanner"
+            else:
+                png, pdf = exporta_lideres(df, indice_nome)
+                label = "lideres_laggards"
+            return png, pdf, label
+
+        if "export_cache" not in st.session_state:
+            st.session_state.export_cache = None
+
+        if st.button("⚙ Gerar exportação", use_container_width=True):
+            with st.spinner("Gerando..."):
+                try:
+                    png, pdf, label = _gera_exports()
                     data_str = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-                    st.download_button("⬇ Baixar PNG", data=png,
-                                       file_name=f"{data_str}_{label}.png",
-                                       mime="image/png", key="dl_png")
-                    st.download_button("⬇ Baixar PDF", data=pdf,
-                                       file_name=f"{data_str}_{label}.pdf",
-                                       mime="application/pdf", key="dl_pdf")
-            except Exception as e:
-                st.error(f"Erro na exportação: {e}")
+                    st.session_state.export_cache = {
+                        "png": png, "pdf": pdf,
+                        "label": label, "data_str": data_str,
+                    }
+                except Exception as e:
+                    st.error(f"Erro: {e}")
+                    st.session_state.export_cache = None
+
+        if st.session_state.export_cache:
+            c = st.session_state.export_cache
+            col_e1.download_button(
+                "⬇ PNG", data=c["png"],
+                file_name=f"{c['data_str']}_{c['label']}.png",
+                mime="image/png", key="dl_png",
+            )
+            col_e2.download_button(
+                "⬇ PDF", data=c["pdf"],
+                file_name=f"{c['data_str']}_{c['label']}.pdf",
+                mime="application/pdf", key="dl_pdf",
+            )

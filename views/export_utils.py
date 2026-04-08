@@ -260,7 +260,8 @@ def png_para_pdf(png_bytes: bytes, titulo: str) -> bytes:
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(200, 200, 200)
     pdf.set_xy(5, 5)
-    pdf.cell(0, 6, titulo, ln=True)
+    titulo_safe = titulo.replace("—", "-").replace("–", "-")
+    pdf.cell(0, 6, titulo_safe, ln=True)
 
     pdf.image(img_buf, x=5, y=12, w=287)
 
@@ -268,7 +269,7 @@ def png_para_pdf(png_bytes: bytes, titulo: str) -> bytes:
     pdf.set_font("Helvetica", "", 7)
     pdf.set_text_color(100, 100, 100)
     pdf.set_xy(5, 203)
-    pdf.cell(0, 5, f"Gerado em {data_str} · RS Quadrants · cobalt-grid")
+    pdf.cell(0, 5, f"Gerado em {data_str} | RS Quadrants | cobalt-grid")
 
     return bytes(pdf.output())
 
