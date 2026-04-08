@@ -128,8 +128,8 @@ def _render_table(subset: pd.DataFrame, indice_nome: str, show_top: bool = None)
 
     styled = (
         display.style
-        .applymap(color_rs,   subset=["RS Ratio (σ)", "RS Mom (σ)"])
-        .applymap(color_perf, subset=["Perf 21d %", f"vs {indice_nome} 21d %"])
+        .map(color_rs,   subset=["RS Ratio (σ)", "RS Mom (σ)"])
+        .map(color_perf, subset=["Perf 21d %", f"vs {indice_nome} 21d %"])
         .format({
             "RS Ratio (σ)":           "{:+.2f}",
             "RS Mom (σ)":             "{:+.2f}",

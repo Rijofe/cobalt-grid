@@ -246,8 +246,8 @@ def _render_table(subset: pd.DataFrame, indice_nome: str):
 
     styled = (
         display.style
-        .applymap(color_rs,   subset=["RS atual (σ)", "Mom atual (σ)"])
-        .applymap(color_dias, subset=["Dias atrás"])
+        .map(color_rs,   subset=["RS atual (σ)", "Mom atual (σ)"])
+        .map(color_dias, subset=["Dias atrás"])
         .format({
             "RS atual (σ)":  "{:+.2f}",
             "Mom atual (σ)": "{:+.2f}",
