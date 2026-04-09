@@ -422,13 +422,13 @@ def _pdf_scanner(compras, vendas, indice_nome, janela):
             pdf.espaco(2)
             continue
         pdf.linha_cabecalho_tabela(cabecalho, widths)
+        cor_linha = (100,180,80) if "Compra" in titulo else (220,80,80)
         for _, r in subset.sort_values("dias_atrás").iterrows():
             dias = int(r["dias_atrás"])
             trans = r.get("transição", r.get("transicao", ""))
             trans_safe = str(trans).replace("→","->").replace("★","*")
             dias_str = "Hoje" if dias == 0 else f"{dias}d atras"
             pdf.set_font("Helvetica", "", 8)
-            cor_linha = (100,180,80) if float(r["rs_atual"]) > 0 else (220,80,80)
             pdf.set_text_color(*cor_linha)
             pdf.cell(18, 5, pdf._safe(r["ticker"]))
             pdf.cell(35, 5, pdf._safe(str(r["nome"])[:20]))
