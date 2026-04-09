@@ -20,6 +20,8 @@ INDICES = {
     "S&P 500":                           "^GSPC",
     "Nasdaq 100":                        "^NDX",
     "Russell 2000":                      "^RUT",
+    "MSCI World (URTH)":               "URTH",
+    "Total World — Vanguard (VT)":     "VT",
 }
 
 # --- Universos de ativos ---
@@ -245,6 +247,35 @@ UNIVERSOS: dict[str, dict[str, str]] = {
         "NFLX":  "Netflix",
         "NVDA":  "Nvidia",
         "TSLA":  "Tesla",
+    },
+
+    "ETFs Global — Bolsas por Pais": {
+        "GREK":  "Greece 20 ETF",
+        "GXG":   "Colombia 20 ETF",
+        "EPU":   "Peru ETF",
+        "EWO":   "Austria ETF",
+        "EWK":   "Belgium ETF",
+        "EWZ":   "Brazil ETF",
+        "EWC":   "Canada ETF",
+        "ECH":   "Chile ETF",
+        "MCHI":  "China ETF",
+        "EFNL":  "Finland ETF",
+        "EWQ":   "France ETF",
+        "EWH":   "Hong Kong ETF",
+        "EIRL":  "Ireland ETF",
+        "EIS":   "Israel ETF",
+        "EWI":   "Italy ETF",
+        "EWW":   "Mexico ETF",
+        "EWN":   "Netherlands ETF",
+        "EPOL":  "Poland ETF",
+        "EZA":   "South Africa ETF",
+        "EWY":   "South Korea ETF",
+        "EWP":   "Spain ETF",
+        "EWD":   "Sweden ETF",
+        "EWL":   "Switzerland ETF",
+        "UAE":   "UAE ETF",
+        "EWU":   "United Kingdom ETF",
+        "VNM":   "Vietnam ETF",
     },
 }
 
