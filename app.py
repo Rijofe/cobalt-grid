@@ -239,7 +239,7 @@ with st.sidebar:
             exp_params = dict(rs_window=rs_window, mom_window=mom_window,
                               smoothing=smoothing, neutral_band=neutral_band)
             if "Quadrantes" in slide:
-                sel = st.session_state.get("sel_global", None)
+                sel = st.session_state.get("selected_ticker", None)
                 png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params,
                                               selected_ticker=sel,
                                               prices=prices, index_series=index_series)
