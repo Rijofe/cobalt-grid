@@ -41,6 +41,7 @@ def render(df, prices, index_series, indice_nome, tickers_dict,
     col1, col2 = st.columns([2, 1])
     with col1:
         escolha = st.selectbox("Ativo para análise histórica", options=list(opcoes.keys()))
+        st.session_state["ticker_historico"] = opcoes.get(escolha, escolha)
     with col2:
         janela = st.select_slider(
             "Período (pregões)",
@@ -48,6 +49,7 @@ def render(df, prices, index_series, indice_nome, tickers_dict,
             value=126,
             format_func=lambda v: f"{v}d (~{v//21}m)",
         )
+        st.session_state["janela_historico"] = janela
 
     ticker = opcoes[escolha]
     nome   = tickers_dict.get(ticker, ticker)

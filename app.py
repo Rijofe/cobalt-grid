@@ -228,31 +228,59 @@ with st.sidebar:
     st.divider()
     st.markdown("#### Exportar slide atual")
 
-    slides_com_export = ("Quadrantes", "Líderes", "Scanner")
-    slide_ok = any(s in slide for s in slides_com_export)
-
-    if not slide_ok:
-        st.caption("Exportação disponível nos slides: Quadrantes, Líderes e Scanner.")
-    else:
+    slide_ok = True  # todos os slides suportam exportação
+    if slide_ok:
         col_e1, col_e2 = st.columns(2)
 
         def _gera_exports():
-            from views.export_utils import exporta_quadrantes, exporta_scanner, exporta_lideres
+            from views.export_utils import (exporta_quadrantes, exporta_scanner,
+                                             exporta_lideres, exporta_ativo,
+                                             exporta_breadth, exporta_historico)
+            exp_params = dict(rs_window=rs_window, mom_window=mom_window,
+                              smoothing=smoothing, neutral_band=neutral_band)
             if "Quadrantes" in slide:
-                exp_params = dict(rs_window=rs_window, mom_window=mom_window)
-                png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params)
+                sel = st.session_state.get("sel_global", None)
+                png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params,
+                                              selected_ticker=sel,
+                                              prices=prices, index_series=index_series)
                 label = "quadrantes"
             elif "Scanner" in slide:
                 from views.scanner_view import _scan
-                resultados = _scan(df, prices, index_series, tickers_dict, 10,
+                janela_s = st.session_state.get("scanner_janela", 10)
+                resultados = _scan(df, prices, index_series, tickers_dict, janela_s,
                                    rs_window, mom_window, smoothing, neutral_band, False)
                 compras = resultados[resultados["tipo"] == "compra"] if not resultados.empty else pd.DataFrame()
                 vendas  = resultados[resultados["tipo"] == "venda"]  if not resultados.empty else pd.DataFrame()
-                png, pdf = exporta_scanner(compras, vendas, indice_nome, 10)
+                png, pdf = exporta_scanner(compras, vendas, indice_nome, janela_s)
                 label = "scanner"
-            else:
+            elif "Lideres" in slide:
                 png, pdf = exporta_lideres(df, indice_nome)
                 label = "lideres_laggards"
+            elif "Individual" in slide:
+                sel = st.session_state.get("ticker_individual", df["ticker"].iloc[0])
+                row = df[df["ticker"] == sel].iloc[0] if not df[df["ticker"] == sel].empty else df.iloc[0]
+                janela_i = st.session_state.get("janela_individual", 63)
+                png, pdf = exporta_ativo(row, indice_nome, prices, index_series, janela_i)
+                label = "ativo_individual"
+            elif "Breadth" in slide:
+                png, pdf = exporta_breadth(df, breadth, indice_nome, idx_perf)
+                label = "market_breadth"
+            elif "Historico" in slide or "Histórico" in slide:
+                sel = st.session_state.get("ticker_historico", df["ticker"].iloc[0])
+                janela_h = st.session_state.get("janela_historico", 126)
+                from engine.rs_calc import compute_quadrant_history
+                hist = compute_quadrant_history(
+                    prices=prices, index_series=index_series, ticker=sel,
+                    rs_window=rs_window, mom_window=mom_window,
+                    smoothing=smoothing, neutral_band=neutral_band,
+                )
+                hist_sub = hist.iloc[-janela_h:].reset_index(drop=True) if not hist.empty else hist
+                ticker_clean = sel.replace(".SA","")
+                png, pdf = exporta_historico(hist_sub, ticker_clean, indice_nome, janela_h)
+                label = "historico"
+            else:
+                png, pdf = exporta_lideres(df, indice_nome)
+                label = "slide"
             return png, pdf, label
 
         if "export_cache" not in st.session_state:

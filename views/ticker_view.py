@@ -37,6 +37,7 @@ def render(df, prices, index_series, indice_nome, tickers_dict, **kwargs):
     }
 
     escolha = st.selectbox("Selecione o ativo", options=list(opcoes.keys()))
+    st.session_state["ticker_individual"] = opcoes.get(escolha, escolha)
     ticker  = opcoes[escolha]
     row     = df[df["ticker"] == ticker].iloc[0]
     q       = int(row["quadrant"])
