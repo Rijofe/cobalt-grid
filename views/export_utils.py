@@ -87,28 +87,57 @@ def exporta_quadrantes(df, indice_nome, breadth, params,
                        selected_ticker=None, prices=None, index_series=None):
     has_detail = (selected_ticker is not None and
                   not df[df["ticker"] == selected_ticker].empty)
-    height = 10.5 if not has_detail else 15
+
+    # Layout: cabeçalho fixo + cards topo + grade + (opcional) detalhe
+    n_rows = 5 if has_detail else 4  # cards, grade(x3), detalhe
+    height_ratios = [0.5, 1, 3, 3, 3] if not has_detail else [0.5, 1, 3, 3, 3, 2.5]
+    height = 13 if not has_detail else 18
+
     fig = plt.figure(figsize=(18, height))
     fig.patch.set_facecolor(BG)
 
-    sub = (f"Breadth: {breadth.get('breadth_score',0):+d}  |  "
-           f"Acima: {breadth.get('pct_up',0):.1f}%  |  "
-           f"Neutros: {breadth.get('pct_neut',0):.1f}%  |  "
-           f"Abaixo: {breadth.get('pct_down',0):.1f}%  |  "
-           f"RS {params.get('rs_window',21)}d  Mom {params.get('mom_window',5)}d  "
-           f"{params.get('smoothing','EMA')}  Banda +-{params.get('neutral_band',0.5)}s")
+    n_gs = 5 if not has_detail else 6
+    hr   = [0.5, 1, 3, 3, 3] if not has_detail else [0.5, 1, 3, 3, 3, 2.5]
+    gs   = gridspec.GridSpec(n_gs, 1, figure=fig, height_ratios=hr,
+                             hspace=0.08, top=0.97, bottom=0.02, left=0.04, right=0.98)
 
-    if has_detail:
-        gs = gridspec.GridSpec(2, 1, figure=fig, height_ratios=[3, 1.8],
-                               hspace=0.08, top=0.93, bottom=0.04, left=0.04, right=0.98)
-        gs_grade = gridspec.GridSpecFromSubplotSpec(3, 3, subplot_spec=gs[0], hspace=0.06, wspace=0.04)
-        gs_det   = gridspec.GridSpecFromSubplotSpec(1, 5, subplot_spec=gs[1], wspace=0.05)
-    else:
-        gs_grade = gridspec.GridSpec(3, 3, figure=fig, hspace=0.06, wspace=0.04,
-                                     top=0.92, bottom=0.04, left=0.04, right=0.98)
+    # ── Título ──
+    ax_title = fig.add_subplot(gs[0])
+    ax_title.set_facecolor(BG); ax_title.axis("off")
+    ax_title.text(0.5, 0.7, f"Quadrantes - vs {indice_nome}",
+                  transform=ax_title.transAxes, ha="center", va="center",
+                  color=TXT, fontsize=14, fontweight="bold")
+    ax_title.text(0.5, 0.1,
+                  f"RS {params.get('rs_window',21)}d  Mom {params.get('mom_window',5)}d  "
+                  f"{params.get('smoothing','EMA')}  Banda +-{params.get('neutral_band',0.5)}s  |  {_now()}",
+                  transform=ax_title.transAxes, ha="center", va="center",
+                  color=MUTED, fontsize=8)
 
-    _fig_header(fig, f"RS Quadrants - vs {indice_nome}", sub)
+    # ── Cards de métricas do topo ──
+    gs_cards = gridspec.GridSpecFromSubplotSpec(1, 5, subplot_spec=gs[1], wspace=0.06)
+    score = breadth.get("breadth_score", 0)
+    idx_p = breadth.get("idx_perf_21d", None)
+    cards_top = [
+        ("Breadth Score",    f"{score:+d}",                              score),
+        ("Acima do indice",  f"{breadth.get('pct_up',0):.1f}%",         breadth.get("pct_up",0)-50),
+        ("Neutros",          f"{breadth.get('pct_neut',0):.1f}%",       0),
+        ("Abaixo do indice", f"{breadth.get('pct_down',0):.1f}%",      -(breadth.get("pct_down",0)-50)),
+        (indice_nome[:20],   f"{idx_p:+.1f}%" if idx_p else "-",        idx_p or 0),
+    ]
+    for i, (lbl, val, v) in enumerate(cards_top):
+        axc = fig.add_subplot(gs_cards[0, i])
+        axc.set_facecolor(CARD)
+        cor = GREEN if v > 0 else RED if v < 0 else MUTED
+        axc.text(0.5, 0.62, val, transform=axc.transAxes,
+                 ha="center", va="center", fontsize=16, fontweight="bold", color=cor)
+        axc.text(0.5, 0.22, lbl, transform=axc.transAxes,
+                 ha="center", va="center", fontsize=8, color=MUTED)
+        axc.set_xticks([]); axc.set_yticks([])
+        for sp in axc.spines.values(): sp.set_edgecolor("#2a2a2a"); sp.set_linewidth(0.5)
 
+    # ── Grade 3x3 ──
+    gs_grade = gridspec.GridSpecFromSubplotSpec(3, 3, subplot_spec=gs[2:5],
+                                                hspace=0.06, wspace=0.04)
     col_labels = ["<- Perdendo forca", "Estavel", "Acelerando ->"]
     row_labels  = ["^ Acima", "-> Neutro", "v Abaixo"]
     row_colors  = [GREEN, AMBER, RED]
@@ -145,35 +174,58 @@ def exporta_quadrantes(df, indice_nome, breadth, params,
             ax.set_xticks([]); ax.set_yticks([])
             for sp in ax.spines.values(): sp.set_visible(False)
 
+    # ── Painel de detalhe ──
     if has_detail:
         row_d = df[df["ticker"] == selected_ticker].iloc[0]
-        q_d = int(row_d["quadrant"])
+        q_d   = int(row_d["quadrant"])
+        gs_det = gridspec.GridSpecFromSubplotSpec(1, 6, subplot_spec=gs[5], wspace=0.06)
+
+        # Badge identificação
         ax0 = fig.add_subplot(gs_det[0, 0])
         ax0.set_facecolor(QUAD_BG[q_d])
-        ax0.text(0.5, 0.65, selected_ticker.replace(".SA",""), transform=ax0.transAxes,
+        ax0.text(0.5, 0.72, selected_ticker.replace(".SA",""), transform=ax0.transAxes,
                  ha="center", va="center", fontsize=14, fontweight="bold", color=QUAD_TX[q_d])
-        ax0.text(0.5, 0.40, row_d["nome"][:18], transform=ax0.transAxes,
+        ax0.text(0.5, 0.47, row_d["nome"][:18], transform=ax0.transAxes,
                  ha="center", va="center", fontsize=8, color=QUAD_TX[q_d], alpha=0.85)
-        ax0.text(0.5, 0.18, f"Q{q_d} - {QUAD_LABEL[q_d]}", transform=ax0.transAxes,
+        ax0.text(0.5, 0.22, f"Q{q_d} - {QUAD_LABEL[q_d]}", transform=ax0.transAxes,
                  ha="center", va="center", fontsize=7, color=QUAD_TX[q_d], alpha=0.7)
         ax0.set_xticks([]); ax0.set_yticks([])
         for sp in ax0.spines.values(): sp.set_visible(False)
+
+        # 4 métricas
         metrics = [
-            ("RS Ratio", f"{row_d['rs_ratio']:+.2f}s", row_d["rs_ratio"]),
-            ("RS Momentum", f"{row_d['rs_mom']:+.2f}s", row_d["rs_mom"]),
-            ("Perf 21d", f"{row_d['perf_21d']:+.1f}%", row_d["perf_21d"]),
-            (f"vs {indice_nome[:8]} 21d", f"{row_d['perf_vs_index']:+.1f}%", row_d["perf_vs_index"]),
+            ("RS Ratio (z-score)", f"{row_d['rs_ratio']:+.2f}s", row_d["rs_ratio"]),
+            ("RS Momentum",        f"{row_d['rs_mom']:+.2f}s",   row_d["rs_mom"]),
+            ("Perf. 21d",          f"{row_d['perf_21d']:+.1f}%", row_d["perf_21d"]),
+            (f"vs {indice_nome[:10]} 21d", f"{row_d['perf_vs_index']:+.1f}%", row_d["perf_vs_index"]),
         ]
         for i, (lbl, val, v) in enumerate(metrics):
             axm = fig.add_subplot(gs_det[0, i+1])
             axm.set_facecolor(CARD)
             color = GREEN if v > 0 else RED if v < 0 else MUTED
             axm.text(0.5, 0.62, val, transform=axm.transAxes,
-                     ha="center", va="center", fontsize=13, fontweight="bold", color=color)
-            axm.text(0.5, 0.25, lbl, transform=axm.transAxes,
+                     ha="center", va="center", fontsize=14, fontweight="bold", color=color)
+            axm.text(0.5, 0.22, lbl, transform=axm.transAxes,
                      ha="center", va="center", fontsize=7.5, color=MUTED)
             axm.set_xticks([]); axm.set_yticks([])
             for sp in axm.spines.values(): sp.set_edgecolor("#333333"); sp.set_linewidth(0.5)
+
+        # Gráfico RS histórico
+        ax_rs = fig.add_subplot(gs_det[0, 5])
+        ax_rs.set_facecolor(CARD)
+        rs_series = row_d.get("rs_series")
+        if rs_series is not None and len(rs_series) > 0:
+            color_line = GREEN if row_d["rs_ratio"] >= 0 else RED
+            ax_rs.plot(range(len(rs_series)), rs_series.values,
+                       color=color_line, linewidth=1.5)
+            ax_rs.fill_between(range(len(rs_series)), rs_series.values,
+                               0, alpha=0.15, color=color_line)
+            ax_rs.axhline(0,    color=MUTED, linewidth=0.7, linestyle="--")
+            ax_rs.axhline(0.5,  color=GREEN, linewidth=0.5, linestyle=":")
+            ax_rs.axhline(-0.5, color=RED,   linewidth=0.5, linestyle=":")
+        ax_rs.set_title(f"RS Ratio (z-score) - 63 pregoes", color=MUTED, fontsize=7.5, pad=2)
+        ax_rs.tick_params(colors=MUTED, labelsize=6)
+        for sp in ax_rs.spines.values(): sp.set_edgecolor("#333333"); sp.set_linewidth(0.5)
 
     png = _fig_to_bytes(fig)
     return png, _png_to_pdf(png, f"RS Quadrants - vs {indice_nome}")

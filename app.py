@@ -240,7 +240,8 @@ with st.sidebar:
                               smoothing=smoothing, neutral_band=neutral_band)
             if "Quadrantes" in slide:
                 sel = st.session_state.get("selected_ticker", None)
-                png, pdf = exporta_quadrantes(df, indice_nome, breadth, exp_params,
+                breadth_ext = {**breadth, "idx_perf_21d": idx_perf.get("21d")}
+                png, pdf = exporta_quadrantes(df, indice_nome, breadth_ext, exp_params,
                                               selected_ticker=sel,
                                               prices=prices, index_series=index_series)
                 label = "quadrantes"
