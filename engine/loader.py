@@ -14,6 +14,9 @@ from datetime import datetime, timedelta
 LOOKBACK_DAYS = 400   # dias corridos para cobrir ~252 pregões + folga
 MAX_RETRIES   = 2     # tentativas em caso de falha de rede
 
+# Ticker virtual para IBOV dolarizado (calculado internamente)
+IBOV_USD_TICKER = "__IBOV_USD__"
+
 
 # ── Funções públicas ──────────────────────────────────────────
 
@@ -40,9 +43,23 @@ def load_prices(
     end   = datetime.today()
     start = end - timedelta(days=lookback_days)
 
-    all_tickers = list(set(tickers + [index_ticker]))
-
-    raw = _download(all_tickers, start, end)
+    # IBOV dolarizado: baixa ^BVSP e BRL=X separadamente
+    if index_ticker == IBOV_USD_TICKER:
+        raw = _download(list(set(tickers)), start, end)
+        ibov_raw = _download(["^BVSP", "BRL=X"], start, end)
+        if isinstance(ibov_raw.columns, pd.MultiIndex):
+            bvsp = ibov_raw["Close"]["^BVSP"]
+            brl  = ibov_raw["Close"]["BRL=X"]
+        else:
+            bvsp = ibov_raw["Close"]
+            brl  = ibov_raw["Close"]
+        bvsp = _clean_series(bvsp)
+        brl  = _clean_series(brl)
+        common_fx = bvsp.index.intersection(brl.index)
+        ibov_usd  = (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
+    else:
+        all_tickers = list(set(tickers + [index_ticker]))
+        raw = _download(all_tickers, start, end)
 
     # Extrai coluna "Close" independente de versão do yfinance
     if isinstance(raw.columns, pd.MultiIndex):
@@ -53,7 +70,10 @@ def load_prices(
     close = _clean(close)
 
     # Separa índice dos ativos
-    if index_ticker in close.columns:
+    if index_ticker == IBOV_USD_TICKER:
+        index_series = ibov_usd
+        prices       = close
+    elif index_ticker in close.columns:
         index_series = close[index_ticker].rename(index_ticker)
         asset_cols   = [c for c in close.columns if c != index_ticker]
         prices       = close[asset_cols]
