@@ -185,9 +185,9 @@ def render(df, indice_nome, tickers_dict, **kwargs):
 
     styled = (
         display2.style
-        .applymap(color_rs, subset=["RS Ratio", "RS Mom", "Perf 21d",
+        .map(color_rs, subset=["RS Ratio", "RS Mom", "Perf 21d",
                                     f"vs {indice_nome[:15]}"])
-        .applymap(color_q, subset=["Q"])
+        .map(color_q, subset=["Q"])
     )
 
     st.dataframe(styled, use_container_width=True, hide_index=True)
