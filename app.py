@@ -142,6 +142,7 @@ Com ±0.5σ, ~38% dos ativos ficam no neutro em condições normais. Abaixo de �
         "Slide",
         options=[
             "📊  Quadrantes",
+            "🏭  Setorial",
             "🌡️  Market Breadth",
             "🏆  Líderes & Laggards",
             "🔍  Ativo Individual",
@@ -201,6 +202,10 @@ params = dict(
 
 if "Quadrantes" in slide:
     from views.quadrant_view import render
+    render(**params)
+
+elif "Setorial" in slide:
+    from views.sector_view import render
     render(**params)
 
 elif "Breadth" in slide:
