@@ -64,19 +64,29 @@ def _fig_to_bytes(fig):
 
 
 def _png_to_pdf(png, titulo):
-    pdf = FPDF(orientation="L", unit="mm", format="A4")
+    from PIL import Image as PILImage
+    # Descobre dimensões reais do PNG
+    img = PILImage.open(io.BytesIO(png))
+    w_px, h_px = img.size
+    dpi = 150
+    w_mm = w_px / dpi * 25.4
+    h_mm = h_px / dpi * 25.4 + 15  # +15mm para título e rodapé
+
+    pdf = FPDF(orientation="L" if w_mm > h_mm else "P",
+               unit="mm", format=(max(w_mm, h_mm), min(w_mm, h_mm))
+               if w_mm > h_mm else (w_mm, h_mm))
     pdf.add_page()
     pdf.set_fill_color(17, 17, 17)
-    pdf.rect(0, 0, 297, 210, "F")
+    pdf.rect(0, 0, w_mm, h_mm, "F")
     titulo_safe = titulo.replace("—","-").replace("–","-").replace("·",".")
     pdf.set_font("Helvetica", "B", 9)
     pdf.set_text_color(200, 200, 200)
     pdf.set_xy(5, 3)
     pdf.cell(0, 5, titulo_safe)
-    pdf.image(io.BytesIO(png), x=4, y=10, w=289)
+    pdf.image(io.BytesIO(png), x=4, y=10, w=w_mm - 8)
     pdf.set_font("Helvetica", "", 6)
     pdf.set_text_color(80, 80, 80)
-    pdf.set_xy(5, 204)
+    pdf.set_xy(5, h_mm - 6)
     pdf.cell(0, 4, f"Gerado em {_now()} | RS Quadrants | cobalt-grid")
     return bytes(pdf.output())
 
