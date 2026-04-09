@@ -249,6 +249,20 @@ UNIVERSOS: dict[str, dict[str, str]] = {
         "TSLA":  "Tesla",
     },
 
+    "BDRs — Brasileiras no Exterior": {
+        "INBR32.SA": "Inter&Co",
+        "XPBR31.SA": "XP Inc.",
+        "ROXO34.SA": "Nubank",
+        "JBSS32.SA": "JBS",
+        "PAGS34.SA": "PagSeguro",
+        "STOC31.SA": "StoneCo",
+        "MELI34.SA": "Mercado Libre",
+        "A2FY34.SA": "Afya",
+        "V2TX34.SA": "Vtex",
+        "P2AX34.SA": "Patria Investimentos",
+        "ARCE34.SA": "Arcos Dorados",
+    },
+
     "ETFs Global — Bolsas por Pais": {
         "GREK":  "Greece 20 ETF",
         "GXG":   "Colombia 20 ETF",
@@ -374,4 +388,16 @@ SETORES: dict[str, str] = {
     "ENJU3.SA": "Tecnologia", "ESPA3.SA": "Saude",
     "IFCM3.SA": "Tecnologia", "LWSA3.SA": "Tecnologia",
     "ISAE4.SA": "Energia Eletrica",
+    # BDRs Brasileiras no Exterior
+    "INBR32.SA": "Financeiro",
+    "XPBR31.SA": "Financeiro",
+    "ROXO34.SA": "Financeiro",
+    "JBSS32.SA": "Alimentos e Bebidas",
+    "PAGS34.SA": "Financeiro",
+    "STOC31.SA": "Financeiro",
+    "MELI34.SA": "Tecnologia",
+    "A2FY34.SA": "Educacao",
+    "V2TX34.SA": "Tecnologia",
+    "P2AX34.SA": "Financeiro",
+    "ARCE34.SA": "Alimentos e Bebidas",
 }
