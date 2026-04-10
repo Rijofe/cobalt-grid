@@ -174,7 +174,7 @@ def _rs_chart(hist: pd.DataFrame):
     ))
 
     fig.add_hline(y=0,    line_dash="dot",  line_color="#888", line_width=0.8)
-    fig.add_hline(y=0.5,  line_dash="dash", line_color="#3B6D11", line_width=0.6)
+    fig.add_hline(y=0.5,  line_dash="dash", line_color="#4CAF50", line_width=0.6)
     fig.add_hline(y=-0.5, line_dash="dash", line_color="#A32D2D", line_width=0.6)
 
     fig.update_layout(

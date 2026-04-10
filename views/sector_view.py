@@ -60,7 +60,7 @@ def render(df, indice_nome, tickers_dict, **kwargs):
 
     # Gráfico de barras horizontal
     colors = [
-        "#3B6D11" if v > 0.5 else "#E24B4A" if v < -0.5 else "#EF9F27"
+        "#4CAF50" if v > 0.5 else "#F44336" if v < -0.5 else "#EF9F27"
         for v in resumo["rs_medio"]
     ]
 
@@ -158,8 +158,8 @@ def render(df, indice_nome, tickers_dict, **kwargs):
     def color_rs(val):
         try:
             v = float(str(val).replace("s", "").replace("σ", ""))
-            if v > 0.5:  return "color: #97C459; font-weight: 500"
-            if v < -0.5: return "color: #E24B4A; font-weight: 500"
+            if v > 0.5:  return "color: #4CAF50; font-weight: 500"
+            if v < -0.5: return "color: #F44336; font-weight: 500"
         except Exception:
             pass
         return ""

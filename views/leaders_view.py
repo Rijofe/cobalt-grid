@@ -111,8 +111,8 @@ def _render_table(subset: pd.DataFrame, indice_nome: str, show_top: bool = None)
     def color_rs(val):
         try:
             v = float(val)
-            if v > 0.5:   return "color: #27500A; font-weight: 500"
-            if v < -0.5:  return "color: #791F1F; font-weight: 500"
+            if v > 0.5:   return "color: #4CAF50; font-weight: 500"
+            if v < -0.5:  return "color: #F44336; font-weight: 500"
         except Exception:
             pass
         return ""
@@ -120,8 +120,8 @@ def _render_table(subset: pd.DataFrame, indice_nome: str, show_top: bool = None)
     def color_perf(val):
         try:
             v = float(val)
-            if v > 0: return "color: #27500A"
-            if v < 0: return "color: #791F1F"
+            if v > 0: return "color: #4CAF50"
+            if v < 0: return "color: #F44336"
         except Exception:
             pass
         return ""

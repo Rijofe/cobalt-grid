@@ -122,7 +122,7 @@ def render(df, prices, index_series, indice_nome, tickers_dict, **kwargs):
     ), row=1, col=1)
 
     # Painel inferior: RS Ratio
-    rs_color = "#3B6D11" if row["rs_ratio"] >= 0 else "#A32D2D"
+    rs_color = "#4CAF50" if row["rs_ratio"] >= 0 else "#A32D2D"
     fig.add_trace(go.Scatter(
         x=rs_plot.index, y=rs_plot.values,
         name="RS Ratio (z-score)",
@@ -133,7 +133,7 @@ def render(df, prices, index_series, indice_nome, tickers_dict, **kwargs):
     ), row=2, col=1)
 
     fig.add_hline(y=0,    line_dash="dot", line_color="#888", line_width=0.8, row=2, col=1)
-    fig.add_hline(y=0.5,  line_dash="dash", line_color="#3B6D11", line_width=0.6, row=2, col=1)
+    fig.add_hline(y=0.5,  line_dash="dash", line_color="#4CAF50", line_width=0.6, row=2, col=1)
     fig.add_hline(y=-0.5, line_dash="dash", line_color="#A32D2D", line_width=0.6, row=2, col=1)
 
     fig.update_layout(

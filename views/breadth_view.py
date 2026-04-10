@@ -100,12 +100,12 @@ def _gauge(score: int):
         title={"text": "Breadth Score", "font": {"size": 13}},
         gauge={
             "axis": {"range": [-100, 100], "tickwidth": 1, "tickfont": {"size": 10}},
-            "bar":  {"color": "#3B6D11" if score >= 0 else "#A32D2D", "thickness": 0.25},
+            "bar":  {"color": "#4CAF50" if row["rs_ratio"] >= 0 else "#A32D2D", "thickness": 0.25},
             "steps": [
-                {"range": [-100, -50], "color": "#791F1F"},
+                {"range": [-100, -50], "color": "#F44336"},
                 {"range": [-50,    0], "color": "#F7C1C1"},
                 {"range": [0,     50], "color": "#C0DD97"},
-                {"range": [50,   100], "color": "#3B6D11"},
+                {"range": [50,   100], "color": "#4CAF50"},
             ],
             "threshold": {
                 "line": {"color": "white", "width": 2},
@@ -153,7 +153,7 @@ def _bar_chart(df: pd.DataFrame):
 def _donut(breadth: dict):
     labels = ["↑ Acima", "→ Neutros", "↓ Abaixo"]
     values = [breadth.get("up", 0), breadth.get("neut", 0), breadth.get("down", 0)]
-    colors = ["#3B6D11", "#EF9F27", "#A32D2D"]
+    colors = ["#4CAF50", "#EF9F27", "#A32D2D"]
 
     fig = go.Figure(go.Pie(
         labels=labels,
