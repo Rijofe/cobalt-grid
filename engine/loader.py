@@ -95,6 +95,7 @@ def load_prices(
             f"Índice '{index_ticker}' tem apenas {len(common)} datas em comum "
             "com os ativos. Tente outro índice de referência."
         )
+    index_series_full = index_series.copy()  # serie completa para YTD
     prices       = prices.reindex(common).ffill()
     index_series = index_series.reindex(common).ffill()
 
@@ -110,7 +111,7 @@ def load_prices(
     except Exception:
         index_volume_last = -1.0
 
-    return prices, index_series, index_volume_last
+    return prices, index_series, index_volume_last, index_series_full
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -137,8 +138,6 @@ def index_performance(index_series: pd.Series, index_ticker: str = "") -> dict[s
 
     Retorna dict com chaves: '5d', '21d', '63d', 'ytd'
     """
-    import yfinance as yf
-
     s = index_series.dropna()
     if len(s) < 5:
         return {"5d": 0.0, "21d": 0.0, "63d": 0.0, "ytd": 0.0}
@@ -158,27 +157,6 @@ def index_performance(index_series: pd.Series, index_ticker: str = "") -> dict[s
     if len(ano_anterior) > 0:
         base_ytd = float(ano_anterior.iloc[-1])
         perf["ytd"] = round((last / base_ytd - 1) * 100, 2)
-    elif index_ticker and index_ticker not in (IBOV_USD_TICKER,):
-        # Busca dezembro do ano anterior diretamente no YF
-        try:
-            extra = yf.download(
-                index_ticker,
-                start=f"{ano_atual - 1}-12-01",
-                end=f"{ano_atual}-01-05",
-                auto_adjust=True, progress=False
-            )
-            if isinstance(extra.columns, pd.MultiIndex):
-                extra = extra["Close"][index_ticker]
-            else:
-                extra = extra["Close"]
-            extra = extra.dropna()
-            if len(extra) > 0:
-                base_ytd = float(extra.iloc[-1])
-                perf["ytd"] = round((last / base_ytd - 1) * 100, 2)
-            else:
-                perf["ytd"] = None
-        except Exception:
-            perf["ytd"] = None
     else:
         perf["ytd"] = None
 
