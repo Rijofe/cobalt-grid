@@ -32,6 +32,13 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
     with col_gauge:
         _gauge(breadth.get("breadth_score", 0))
+        pct_up   = breadth.get("pct_up",   0)
+        pct_down = breadth.get("pct_down", 0)
+        st.caption(
+            f"**Breadth Score = % Acima − % Abaixo** "
+            f"= {pct_up:.1f}% − {pct_down:.1f}% = **{pct_up - pct_down:+.1f}**  "
+            f"· Varia de −100 (todos abaixo) a +100 (todos acima)"
+        )
 
     with col_idx:
         st.markdown(f"**{indice_nome} — performance**")
