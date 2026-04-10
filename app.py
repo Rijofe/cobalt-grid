@@ -189,19 +189,29 @@ def _data_caption(series):
     import datetime
     import pytz
     tz_br = pytz.timezone("America/Sao_Paulo")
+    agora_br = datetime.datetime.now(tz_br)
+    hoje = agora_br.date()
+
     ultima = series.index[-1]
+    # Converte para timezone de SP se tiver info, senão assume UTC-3
     if hasattr(ultima, "tzinfo") and ultima.tzinfo is not None:
-        ultima_br = ultima.astimezone(tz_br)
+        data_dado = ultima.astimezone(tz_br).date()
     else:
-        ultima_br = ultima
-    agora = datetime.datetime.now(tz_br)
-    hoje = agora.date()
-    data_dado = ultima_br.date() if hasattr(ultima_br, "date") else ultima_br
+        # Timestamp naive — assume que e horario local BR ou UTC
+        # Adiciona 3h para converter UTC → BRT se necessario
+        try:
+            ts = ultima.to_pydatetime()
+            ts_br = ts + datetime.timedelta(hours=3)  # UTC → BRT
+            data_dado = ts_br.date() if ts_br.date() <= hoje else ts.date()
+        except Exception:
+            data_dado = ultima.date() if hasattr(ultima, "date") else hoje
+
     data_str = data_dado.strftime("%d/%m/%Y")
-    if data_dado == hoje:
-        return f"📅 Dados de {data_str} · defasagem maxima de 1h15min"
+    hora_carga = agora_br.strftime("%H:%M")
+    if data_dado >= hoje:
+        return f"📅 Dados de {data_str} · carregado as {hora_carga} · defasagem de ate 1h15min"
     else:
-        return f"📅 Dados de {data_str} · fechamento"
+        return f"📅 Dados de {data_str} · fechamento · carregado as {hora_carga}"
 
 _caption_texto = _data_caption(index_series)
 
