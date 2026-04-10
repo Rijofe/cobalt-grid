@@ -191,6 +191,7 @@ def _data_caption(series, volume_last=-1.0):
     tz_br = pytz.timezone("America/Sao_Paulo")
     agora_br = datetime.datetime.now(tz_br)
     hoje_str = agora_br.strftime("%d/%m/%Y")
+    hora_carga = agora_br.strftime("%H:%M")
     # Volume > 0 = fechamento confirmado pelo YF
     fechamento_confirmado = volume_last > 0
 
