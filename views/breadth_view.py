@@ -100,7 +100,7 @@ def _gauge(score: int):
         title={"text": "Breadth Score", "font": {"size": 13}},
         gauge={
             "axis": {"range": [-100, 100], "tickwidth": 1, "tickfont": {"size": 10}},
-            "bar":  {"color": "#4CAF50" if row["rs_ratio"] >= 0 else "#A32D2D", "thickness": 0.25},
+            "bar":  {"color": "#4CAF50" if score >= 0 else "#F44336", "thickness": 0.25},
             "steps": [
                 {"range": [-100, -50], "color": "#F44336"},
                 {"range": [-50,    0], "color": "#F7C1C1"},
