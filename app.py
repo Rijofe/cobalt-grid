@@ -190,28 +190,28 @@ def _data_caption(series):
     import pytz
     tz_br = pytz.timezone("America/Sao_Paulo")
     agora_br = datetime.datetime.now(tz_br)
-    hoje = agora_br.date()
-
-    ultima = series.index[-1]
-    # Converte para timezone de SP se tiver info, senão assume UTC-3
-    if hasattr(ultima, "tzinfo") and ultima.tzinfo is not None:
-        data_dado = ultima.astimezone(tz_br).date()
-    else:
-        # Timestamp naive — assume que e horario local BR ou UTC
-        # Adiciona 3h para converter UTC → BRT se necessario
-        try:
-            ts = ultima.to_pydatetime()
-            ts_br = ts + datetime.timedelta(hours=3)  # UTC → BRT
-            data_dado = ts_br.date() if ts_br.date() <= hoje else ts.date()
-        except Exception:
-            data_dado = ultima.date() if hasattr(ultima, "date") else hoje
-
-    data_str = data_dado.strftime("%d/%m/%Y")
+    hoje_str = agora_br.strftime("%d/%m/%Y")
     hora_carga = agora_br.strftime("%H:%M")
-    if data_dado >= hoje:
-        return f"📅 Dados de {data_str} · carregado as {hora_carga} · defasagem de ate 1h15min"
+
+    # Verifica se o fechamento de hoje ja esta disponivel no YF
+    # Considera fechado se tiver dado do dia atual E for apos 18h
+    ultima = series.index[-1]
+    try:
+        if hasattr(ultima, "tzinfo") and ultima.tzinfo is not None:
+            data_dado = ultima.astimezone(tz_br).date()
+        else:
+            ts = ultima.to_pydatetime()
+            ts_br = ts + datetime.timedelta(hours=3)
+            data_dado = ts_br.date()
+    except Exception:
+        data_dado = agora_br.date()
+
+    fechamento_disponivel = (data_dado == agora_br.date() and agora_br.hour >= 18)
+
+    if fechamento_disponivel:
+        return f"📅 Dados de {hoje_str} · fechamento · carregado as {hora_carga}"
     else:
-        return f"📅 Dados de {data_str} · fechamento · carregado as {hora_carga}"
+        return f"📅 Dados de {hoje_str} · carregado as {hora_carga} · defasagem de ate 1h15min"
 
 _caption_texto = _data_caption(index_series)
 
