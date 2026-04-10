@@ -192,8 +192,8 @@ def _data_caption(series, volume_last=-1.0):
     agora_br = datetime.datetime.now(tz_br)
     hoje_str = agora_br.strftime("%d/%m/%Y")
     hora_carga = agora_br.strftime("%H:%M")
-    # Volume > 0 = fechamento confirmado pelo YF
-    fechamento_confirmado = volume_last > 0
+    # Apos 18h15 o fechamento ja foi processado pelo YF
+    fechamento_confirmado = (agora_br.hour > 18) or (agora_br.hour == 18 and agora_br.minute >= 15)
 
     if fechamento_confirmado:
         return f"📅 Dados de {hoje_str} · fechamento · carregado as {hora_carga}"
