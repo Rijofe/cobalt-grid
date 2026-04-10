@@ -195,18 +195,13 @@ def _data_caption(series):
     else:
         ultima_br = ultima
     agora = datetime.datetime.now(tz_br)
-    data_str = ultima_br.strftime("%d/%m/%Y")
-    if hasattr(ultima_br, "hour"):
-        hora_str = ultima_br.strftime("%H:%M") if hasattr(ultima_br, "strftime") else ""
-    else:
-        hora_str = ""
     hoje = agora.date()
     data_dado = ultima_br.date() if hasattr(ultima_br, "date") else ultima_br
-    if data_dado == hoje and agora.hour < 18:
-        status = f"📅 Dados até: {data_str} {hora_str} · pregão aberto — dado parcial"
+    data_str = data_dado.strftime("%d/%m/%Y")
+    if data_dado == hoje:
+        return f"📅 Dados de {data_str} · defasagem maxima de 1h15min"
     else:
-        status = f"📅 Dados até: {data_str} · fechamento"
-    return status
+        return f"📅 Dados de {data_str} · fechamento"
 
 _caption_texto = _data_caption(index_series)
 
