@@ -184,6 +184,32 @@ if df.empty:
     st.error("Nenhum dado disponível para os parâmetros selecionados.")
     st.stop()
 
+# ── Caption de data dos dados ─────────────────────────────────
+def _data_caption(series):
+    import datetime
+    import pytz
+    tz_br = pytz.timezone("America/Sao_Paulo")
+    ultima = series.index[-1]
+    if hasattr(ultima, "tzinfo") and ultima.tzinfo is not None:
+        ultima_br = ultima.astimezone(tz_br)
+    else:
+        ultima_br = ultima
+    agora = datetime.datetime.now(tz_br)
+    data_str = ultima_br.strftime("%d/%m/%Y")
+    if hasattr(ultima_br, "hour"):
+        hora_str = ultima_br.strftime("%H:%M") if hasattr(ultima_br, "strftime") else ""
+    else:
+        hora_str = ""
+    hoje = agora.date()
+    data_dado = ultima_br.date() if hasattr(ultima_br, "date") else ultima_br
+    if data_dado == hoje and agora.hour < 18:
+        status = f"📅 Dados até: {data_str} {hora_str} · pregão aberto — dado parcial"
+    else:
+        status = f"📅 Dados até: {data_str} · fechamento"
+    return status
+
+_caption_texto = _data_caption(index_series)
+
 # ── Roteamento de slides ──────────────────────────────────────
 params = dict(
     df=df,
@@ -202,30 +228,37 @@ params = dict(
 
 if "Quadrantes" in slide:
     from views.quadrant_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Setorial" in slide:
     from views.sector_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Breadth" in slide:
     from views.breadth_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Líderes" in slide:
     from views.leaders_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Individual" in slide:
     from views.ticker_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Histórico" in slide:
     from views.history_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 elif "Scanner" in slide:
     from views.scanner_view import render
+    st.caption(_caption_texto)
     render(**params)
 
 # ── Exportação ────────────────────────────────────────────────
