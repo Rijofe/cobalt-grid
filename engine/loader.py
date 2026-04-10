@@ -150,12 +150,19 @@ def index_performance(index_series: pd.Series) -> dict[str, float]:
         else:
             perf[label] = None
 
-    # YTD: primeiro pregão do ano corrente
-    year_start = s[s.index.year == s.index[-1].year]
-    if len(year_start) > 1:
-        perf["ytd"] = round((last / year_start.iloc[0] - 1) * 100, 2)
+    # YTD: ultimo pregao do ano anterior (igual ao Profit Pro)
+    ano_atual = s.index[-1].year
+    ano_anterior = s[s.index.year == ano_atual - 1]
+    if len(ano_anterior) > 0:
+        base_ytd = ano_anterior.iloc[-1]  # ultimo pregao de dezembro
+        perf["ytd"] = round((last / base_ytd - 1) * 100, 2)
     else:
-        perf["ytd"] = None
+        # Fallback: primeiro pregao do ano atual
+        year_start = s[s.index.year == ano_atual]
+        if len(year_start) > 1:
+            perf["ytd"] = round((last / year_start.iloc[0] - 1) * 100, 2)
+        else:
+            perf["ytd"] = None
 
     return perf
 
