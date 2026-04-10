@@ -57,6 +57,7 @@ def load_prices(
         brl  = _clean_series(brl)
         common_fx = bvsp.index.intersection(brl.index)
         ibov_usd  = (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
+        ibov_raw_vol = -1.0  # volume nao disponivel para IBOV_USD
     else:
         all_tickers = list(set(tickers + [index_ticker]))
         raw = _download(all_tickers, start, end)
@@ -97,7 +98,19 @@ def load_prices(
     prices       = prices.reindex(common).ffill()
     index_series = index_series.reindex(common).ffill()
 
-    return prices, index_series
+    # Volume do último dia do índice (para detectar fechamento)
+    try:
+        if isinstance(raw.columns, pd.MultiIndex):
+            if index_ticker in raw["Volume"].columns:
+                index_volume_last = float(raw["Volume"][index_ticker].iloc[-1])
+            else:
+                index_volume_last = -1.0
+        else:
+            index_volume_last = -1.0
+    except Exception:
+        index_volume_last = -1.0
+
+    return prices, index_series, index_volume_last
 
 
 @st.cache_data(ttl=3600, show_spinner=False)

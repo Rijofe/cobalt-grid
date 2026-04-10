@@ -161,7 +161,7 @@ tickers_list = list(tickers_dict.keys())
 
 with st.spinner("Baixando preços..."):
     try:
-        prices, index_series = load_prices(tickers_list, indice_ticker)
+        prices, index_series, index_volume_last = load_prices(tickers_list, indice_ticker)
         idx_perf = index_performance(index_series)
     except Exception as e:
         st.error(f"Erro ao carregar dados: {e}")
@@ -185,35 +185,21 @@ if df.empty:
     st.stop()
 
 # ── Caption de data dos dados ─────────────────────────────────
-def _data_caption(series):
+def _data_caption(series, volume_last=-1.0):
     import datetime
     import pytz
     tz_br = pytz.timezone("America/Sao_Paulo")
     agora_br = datetime.datetime.now(tz_br)
     hoje_str = agora_br.strftime("%d/%m/%Y")
-    hora_carga = agora_br.strftime("%H:%M")
+    # Volume > 0 = fechamento confirmado pelo YF
+    fechamento_confirmado = volume_last > 0
 
-    # Verifica se o fechamento de hoje ja esta disponivel no YF
-    # Considera fechado se tiver dado do dia atual E for apos 18h
-    ultima = series.index[-1]
-    try:
-        if hasattr(ultima, "tzinfo") and ultima.tzinfo is not None:
-            data_dado = ultima.astimezone(tz_br).date()
-        else:
-            ts = ultima.to_pydatetime()
-            ts_br = ts + datetime.timedelta(hours=3)
-            data_dado = ts_br.date()
-    except Exception:
-        data_dado = agora_br.date()
-
-    fechamento_disponivel = (data_dado == agora_br.date() and agora_br.hour >= 18)
-
-    if fechamento_disponivel:
+    if fechamento_confirmado:
         return f"📅 Dados de {hoje_str} · fechamento · carregado as {hora_carga}"
     else:
         return f"📅 Dados de {hoje_str} · carregado as {hora_carga} · defasagem de ate 1h15min"
 
-_caption_texto = _data_caption(index_series)
+_caption_texto = _data_caption(index_series, index_volume_last)
 
 # ── Roteamento de slides ──────────────────────────────────────
 params = dict(
