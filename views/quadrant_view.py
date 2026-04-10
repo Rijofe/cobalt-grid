@@ -72,7 +72,7 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     grid_html += "<div></div>"
     for lbl in COL_LABELS:
         grid_html += (
-            f"<div style='text-align:center;font-size:10px;font-weight:500;"
+            f"<div style='text-align:center;font-size:12px;font-weight:500;"
             f"color:#888;padding:3px 0'>{lbl}</div>"
         )
 
@@ -80,7 +80,7 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     for row_idx, quad_row in enumerate(GRID_LAYOUT):
         grid_html += (
             f"<div style='display:flex;align-items:center;justify-content:center;"
-            f"font-size:10px;font-weight:500;color:{row_colors[row_idx]};"
+            f"font-size:12px;font-weight:500;color:{row_colors[row_idx]};"
             f"writing-mode:vertical-rl;transform:rotate(180deg)'>"
             f"{ROW_LABELS[row_idx]}</div>"
         )
@@ -100,13 +100,13 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
                     f"<span id='chip_{t_short}' "
                     f"onclick=\"selectTicker('{t_short}','{t_full}')\" "
                     f"style='background:rgba(255,255,255,0.15);color:{tx};"
-                    f"font-size:10px;font-weight:500;padding:2px 6px;"
+                    f"font-size:11px;font-weight:500;padding:2px 6px;"
                     f"border-radius:5px;margin:2px;display:inline-block;"
                     f"cursor:pointer;transition:opacity .15s' "
                     f"onmouseover=\"this.style.opacity='.7'\" "
                     f"onmouseout=\"this.style.opacity='1'\">"
                     f"{t_short} "
-                    f"<span style='opacity:.7;font-size:9px'>{sign}{r['rs_ratio']:.1f}σ</span>"
+                    f"<span style='opacity:.7;font-size:10px'>{sign}{r['rs_ratio']:.1f}σ</span>"
                     f"</span>"
                 )
 
