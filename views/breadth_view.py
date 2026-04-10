@@ -101,31 +101,40 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
 def _gauge(score: int):
     fig = go.Figure(go.Indicator(
-        mode="gauge+number",
+        mode="gauge+number+delta",
         value=score,
-        number={"suffix": "", "font": {"size": 36}},
-        title={"text": "Breadth Score", "font": {"size": 13}},
+        number={"font": {"size": 44, "color": "#4CAF50" if score >= 0 else "#F44336"}},
+        title={"text": "Breadth Score", "font": {"size": 15, "color": "#aaaaaa"}},
         gauge={
-            "axis": {"range": [-100, 100], "tickwidth": 1, "tickfont": {"size": 10}},
-            "bar":  {"color": "#4CAF50" if score >= 0 else "#F44336", "thickness": 0.25},
+            "axis": {
+                "range": [-100, 100],
+                "tickwidth": 1,
+                "tickfont": {"size": 12},
+                "tickvals": [-100, -50, 0, 50, 100],
+            },
+            "bar": {"color": "#4CAF50" if score >= 0 else "#F44336", "thickness": 0.3},
+            "bgcolor": "rgba(0,0,0,0)",
+            "borderwidth": 0,
             "steps": [
-                {"range": [-100, -50], "color": "#F44336"},
-                {"range": [-50,    0], "color": "#F7C1C1"},
-                {"range": [0,     50], "color": "#C0DD97"},
-                {"range": [50,   100], "color": "#4CAF50"},
+                {"range": [-100, -50], "color": "#7B2020"},
+                {"range": [-50,    0], "color": "#4A2020"},
+                {"range": [0,     50], "color": "#1E3A1E"},
+                {"range": [50,   100], "color": "#2A5A2A"},
             ],
             "threshold": {
-                "line": {"color": "white", "width": 2},
-                "thickness": 0.75,
+                "line": {"color": "white", "width": 3},
+                "thickness": 0.8,
                 "value": score,
             },
         },
+        domain={"x": [0, 1], "y": [0.1, 1]},
     ))
     fig.update_layout(
-        height=220,
-        margin=dict(l=20, r=20, t=30, b=0),
+        height=260,
+        margin=dict(l=30, r=30, t=40, b=30),
         paper_bgcolor="rgba(0,0,0,0)",
-        font={"color": "#888"},
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={"color": "#aaaaaa"},
     )
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
