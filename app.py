@@ -162,7 +162,7 @@ tickers_list = list(tickers_dict.keys())
 with st.spinner("Baixando preços..."):
     try:
         prices, index_series, index_volume_last = load_prices(tickers_list, indice_ticker)
-        idx_perf = index_performance(index_series)
+        idx_perf = index_performance(index_series, indice_ticker)
     except Exception as e:
         st.error(f"Erro ao carregar dados: {e}")
         st.stop()

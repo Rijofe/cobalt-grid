@@ -131,12 +131,14 @@ def load_index_only(index_ticker: str, lookback_days: int = LOOKBACK_DAYS) -> pd
     return _clean_series(close).rename(index_ticker)
 
 
-def index_performance(index_series: pd.Series) -> dict[str, float]:
+def index_performance(index_series: pd.Series, index_ticker: str = "") -> dict[str, float]:
     """
     Calcula a performance percentual do índice em janelas fixas.
 
     Retorna dict com chaves: '5d', '21d', '63d', 'ytd'
     """
+    import yfinance as yf
+
     s = index_series.dropna()
     if len(s) < 5:
         return {"5d": 0.0, "21d": 0.0, "63d": 0.0, "ytd": 0.0}
@@ -150,19 +152,35 @@ def index_performance(index_series: pd.Series) -> dict[str, float]:
         else:
             perf[label] = None
 
-    # YTD: ultimo pregao do ano anterior (igual ao Profit Pro)
+    # YTD: ultimo pregao de dezembro do ano anterior (igual ao Profit Pro)
     ano_atual = s.index[-1].year
     ano_anterior = s[s.index.year == ano_atual - 1]
     if len(ano_anterior) > 0:
-        base_ytd = ano_anterior.iloc[-1]  # ultimo pregao de dezembro
+        base_ytd = float(ano_anterior.iloc[-1])
         perf["ytd"] = round((last / base_ytd - 1) * 100, 2)
-    else:
-        # Fallback: primeiro pregao do ano atual
-        year_start = s[s.index.year == ano_atual]
-        if len(year_start) > 1:
-            perf["ytd"] = round((last / year_start.iloc[0] - 1) * 100, 2)
-        else:
+    elif index_ticker and index_ticker not in (IBOV_USD_TICKER,):
+        # Busca dezembro do ano anterior diretamente no YF
+        try:
+            extra = yf.download(
+                index_ticker,
+                start=f"{ano_atual - 1}-12-01",
+                end=f"{ano_atual}-01-05",
+                auto_adjust=True, progress=False
+            )
+            if isinstance(extra.columns, pd.MultiIndex):
+                extra = extra["Close"][index_ticker]
+            else:
+                extra = extra["Close"]
+            extra = extra.dropna()
+            if len(extra) > 0:
+                base_ytd = float(extra.iloc[-1])
+                perf["ytd"] = round((last / base_ytd - 1) * 100, 2)
+            else:
+                perf["ytd"] = None
+        except Exception:
             perf["ytd"] = None
+    else:
+        perf["ytd"] = None
 
     return perf
 
