@@ -175,7 +175,8 @@ def _download(tickers: list[str], start: datetime, end: datetime) -> pd.DataFram
                 end=end.strftime("%Y-%m-%d"),
                 auto_adjust=True,
                 progress=False,
-                threads=True,
+                threads=False,
+                timeout=30,
             )
             if not df.empty:
                 return df
