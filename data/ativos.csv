@@ -1,0 +1,163 @@
+Ticker,nome,setor,subsetor
+ABCB4,Banco ABC Brasil,Financeiro,Banco de Investimento
+ABEV3,Ambev,Consumo,Bebidas
+AERI3,Aeris Energy,Indústria,Energia Renovável
+ALOS3,Allos,Consumo Cíclico,Shopping Centers
+ALPA4,Alpargatas,Consumo Cíclico,Calçados
+ALUP11,Alupar,Utilidade Pública,Energia Elétrica
+AMAR3,Marisa Lojas,Consumo Cíclico,Varejo de Moda
+ANIM3,Animais SA,Consumo Cíclico,Varejo Pet
+ASAI3,Assaí,Consumo,Atacadão
+AUAU3,Petiko,Consumo Cíclico,Varejo Pet
+AURA33,Aura Minerals,Materiais Básicos,Mineração
+AURE3,Auren Energia,Utilidade Pública,Energia Elétrica
+AXIA3,Axia Energia ON,Utilidade Pública,Energia Elétrica
+AXIA6,Axia Energia,Utilidade Pública,Energia Elétrica
+AZZA3,Azzas 2154,Consumo Cíclico,Varejo de Moda
+B3SA3,B3,Financeiro,Bolsa de Valores
+BBAS3,Banco do Brasil,Financeiro,Banco
+BBDC3,Bradesco ON,Financeiro,Banco
+BBDC4,Bradesco PN,Financeiro,Banco
+BBSE3,BB Seguridade,Financeiro,Seguros
+BEEF3,Minerva,Consumo,Alimentos
+BHIA3,BHIA,Consumo Cíclico,Varejo
+BMGB4,Banco BMG,Financeiro,Banco
+BOVA11,ETF Ibovespa,ETF,Índice
+BPAC11,BTG Pactual,Financeiro,Banco de Investimento
+BRAP4,Bradespar,Materiais Básicos,Mineração
+BRAV3,Brava Energia,Petróleo e Gás,Exploração
+BRBI11,BR Banco de Investimentos,Financeiro,Banco de Investimento
+BRKM5,Braskem,Materiais Básicos,Petroquímica
+BRSR6,Banrisul,Financeiro,Banco
+BRST3,Brest,Imobiliário,Lajes Corporativas
+CAML3,Camil,Consumo,Alimentos
+CASH3,Méliuz,Tecnologia,Fintech
+CBAV3,CBA,Materiais Básicos,Alumínio
+CEAB3,C&A Modas,Consumo Cíclico,Varejo de Moda
+CMIG4,Cemig PN,Utilidade Pública,Energia Elétrica
+CMIN3,CSN Mineração,Materiais Básicos,Mineração
+COGN3,Cogna,Educação,Ensino Superior
+CPFE3,CPFL Energia,Utilidade Pública,Energia Elétrica
+CPLE3,Copel ON,Utilidade Pública,Energia Elétrica
+CSAN3,Cosan,Petróleo e Gás,Logística e Energia
+CSMG3,Copasa,Utilidade Pública,Saneamento
+CSNA3,CSN,Materiais Básicos,Siderurgia
+CVCB3,CVC Brasil,Consumo Cíclico,Turismo
+CXSE3,Caixa Seguridade,Financeiro,Seguros
+CYRE3,Cyrela,Imobiliário,Construção Civil
+DIRR3,Direcional,Imobiliário,Construção Civil
+DXCO3,Dexco,Materiais Básicos,Madeira e Papel
+ECOR3,Ecorodovias,Infraestrutura,Concessões
+EGIE3,Engie Brasil,Utilidade Pública,Energia Elétrica
+EMBJ3,Embraer,Indústria,Aeronáutica
+ENEV3,Eneva,Utilidade Pública,Energia Elétrica
+ENGI11,Energisa,Utilidade Pública,Energia Elétrica
+ENJU3,Enjoei,Tecnologia,E-commerce
+EQTL3,Equatorial,Utilidade Pública,Energia Elétrica
+EVEN3,Even,Imobiliário,Construção Civil
+EZTC3,EzTec,Imobiliário,Construção Civil
+FLRY3,Fleury,Saúde,Diagnósticos
+GFSA3,Gafisa,Imobiliário,Construção Civil
+GGBR4,Gerdau PN,Materiais Básicos,Siderurgia
+GMAT3,Grupo Mateus,Consumo,Varejo Alimentar
+GOAU4,Gerdau Metalúrgica,Materiais Básicos,Siderurgia
+GRND3,Grendene,Consumo Cíclico,Calçados
+HAPV3,Hapvida,Saúde,Planos de Saúde
+HBOR3,Helbor,Imobiliário,Construção Civil
+HYPE3,Hypera,Saúde,Farmacêutico
+IGTI11,Iguatemi,Consumo Cíclico,Shopping Centers
+INBR32,Inter&Co,Financeiro,Fintech
+INTB3,Intelbras,Tecnologia,Eletrônicos
+IRBR3,IRB Brasil,Financeiro,Resseguros
+ISAE4,Isa Cteep PN,Utilidade Pública,Transmissão
+ITSA3,Itaúsa ON,Financeiro,Holding
+ITSA4,Itaúsa PN,Financeiro,Holding
+ITUB4,Itaú Unibanco,Financeiro,Banco
+IVVB11,ETF S&P 500,ETF,Índice
+JBSS32,JBS (units),Consumo,Alimentos
+JHSF3,JHSF,Imobiliário,Shopping e Luxo
+KLBN11,Klabin,Materiais Básicos,Papel e Celulose
+LEVE3,Metal Leve,Indústria,Autopeças
+LIGT3,Light,Utilidade Pública,Energia Elétrica
+LJQQ3,Quero-Quero,Consumo Cíclico,Varejo
+LOGG3,Log Commercial,Imobiliário,Galpões Logísticos
+LOGN3,Log-In,Transporte,Logística
+LREN3,Lojas Renner,Consumo Cíclico,Varejo de Moda
+LWSA3,Locaweb,Tecnologia,Software
+MBRF3,MBRF (Marfrig+BRF),Consumo,Alimentos
+MDIA3,M. Dias Branco,Consumo,Alimentos
+MDNE3,Moura Dubeux,Imobiliário,Construção Civil
+MEAL3,International Meal,Consumo Cíclico,Restaurantes
+MGLU3,Magazine Luiza,Consumo Cíclico,Varejo
+MILS3,Mills,Indústria,Locação de Equipamentos
+MLAS3,Multilaser,Tecnologia,Eletrônicos
+MOTV3,Motiva,Consumo Cíclico,Educação Física
+MOVI3,Movida,Consumo Cíclico,Locação de Veículos
+MRVE3,MRV,Imobiliário,Construção Civil
+MTRE3,Mitre,Imobiliário,Construção Civil
+MULT3,Multiplan,Imobiliário,Shopping Centers
+MYPK3,Iochpe-Maxion,Indústria,Autopeças
+NATU3,Natura,Consumo,Cosméticos
+NEOE3,Neoenergia,Utilidade Pública,Energia Elétrica
+NGRD3,Nagro,Agronegócio,Insumos
+ODPV3,Odontoprev,Saúde,Planos Odontológicos
+ORVR3,Orizon,Utilidade Pública,Resíduos
+PCAR3,GPA,Consumo,Varejo Alimentar
+PETR3,Petrobras ON,Petróleo e Gás,Exploração
+PETR4,Petrobras PN,Petróleo e Gás,Exploração
+PLPL3,Plano&Plano,Imobiliário,Construção Civil
+POMO4,Marcopolo PN,Indústria,Veículos
+POSI3,Positivo,Tecnologia,Computadores
+PRIO3,PetroRio,Petróleo e Gás,Exploração
+PRNR3,Priner,Serviços,Indústria e Mineração
+PSSA3,Porto Seguro,Financeiro,Seguros
+PTBL3,PetroTal,Petróleo e Gás,Exploração
+QUAL3,Qualicorp,Saúde,Planos de Saúde
+RAIL3,Rumo,Transporte,Logística Ferroviária
+RANI3,Irani,Materiais Básicos,Papel e Celulose
+RAPT4,Randon,Indústria,Veículos
+RDOR3,Rede D'Or,Saúde,Hospitais
+RECV3,PetroReconcavo,Petróleo e Gás,Exploração
+RENT3,Localiza,Consumo Cíclico,Locação de Veículos
+RIAA3,Raia Drogasil,Saúde,Farmácias
+ROMI3,Romi,Indústria,Máquinas
+ROXO34,Dr. Consulta BDR,Saúde,Telemedicina
+SANB11,Santander BR,Financeiro,Banco
+SAPR11,Sanepar,Utilidade Pública,Saneamento
+SBFG3,SBF Group,Consumo Cíclico,Varejo Esportivo
+SBSP3,Sabesp,Utilidade Pública,Saneamento
+SEER3,Ser Educacional,Educação,Ensino Superior
+SEQL3,Sequoia,Transporte,Logística
+SIMH3,Simpar,Indústria,Holding
+SLCE3,SLC Agrícola,Agronegócio,Grãos
+SMAL11,ETF Small Cap,ETF,Índice
+SMFT3,Smart Fit,Consumo Cíclico,Academia
+SMTO3,São Martinho,Agronegócio,Açúcar e Etanol
+SOJA3,Boa Safra,Agronegócio,Sementes
+SUZB3,Suzano,Materiais Básicos,Papel e Celulose
+TAEE11,Taesa,Utilidade Pública,Transmissão
+TCSA3,Tecnisa,Imobiliário,Construção Civil
+TEND3,Tenda,Imobiliário,Construção Civil
+TGMA3,Tegma,Transporte,Logística
+TIMS3,TIM,Telecomunicações,Telefonia
+TOTS3,Totvs,Tecnologia,Software
+TRAD3,Tradersclub,Tecnologia,Fintech
+TRIS3,Trisul,Imobiliário,Construção Civil
+TSLA34,Tesla BDR,Tecnologia,Veículos Elétricos
+TTEN3,3Tentos,Agronegócio,Grãos
+TUPY3,Tupy,Indústria,Autopeças
+UGPA3,Ultrapar,Petróleo e Gás,Distribuição
+UNIP6,Unipar,Materiais Básicos,Petroquímica
+USIM5,Usiminas,Materiais Básicos,Siderurgia
+VALE3,Vale,Materiais Básicos,Mineração
+VAMO3,Vamos,Indústria,Locação de Veículos
+VBBR3,Vibra Energia,Petróleo e Gás,Distribuição
+VIVA3,Vivara,Consumo Cíclico,Joias
+VIVT3,Telefônica,Telecomunicações,Telefonia
+VLID3,Valid,Tecnologia,Identidade Digital
+VSTE3,Veste,Consumo Cíclico,Varejo de Moda
+VULC3,Vulcabras,Consumo Cíclico,Calçados
+WDCN3,Woodridge,Imobiliário,Lajes Corporativas
+WEGE3,WEG,Indústria,Máquinas e Equipamentos
+XPBR31,XP Inc BDR,Financeiro,Banco de Investimento
+YDUQ3,Yduqs,Educação,Ensino Superior
