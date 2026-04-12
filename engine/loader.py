@@ -59,8 +59,8 @@ def load_prices(
         ibov_usd  = (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
         ibov_raw_vol = -1.0  # volume nao disponivel para IBOV_USD
     else:
-        all_tickers = list(set(tickers + [index_ticker]))
-        raw = _download(all_tickers, start, end)
+        raw       = _download(list(set(tickers)), start, end)
+        raw_index = _download([index_ticker], start, end)
 
     # Extrai coluna "Close" independente de versão do yfinance
     if isinstance(raw.columns, pd.MultiIndex):
@@ -74,15 +74,23 @@ def load_prices(
     if index_ticker == IBOV_USD_TICKER:
         index_series = ibov_usd
         prices       = close
-    elif index_ticker in close.columns:
-        index_series = close[index_ticker].rename(index_ticker)
-        asset_cols   = [c for c in close.columns if c != index_ticker]
-        prices       = close[asset_cols]
     else:
-        raise ValueError(
-            f"Índice '{index_ticker}' não encontrado nos dados baixados. "
-            "Verifique o ticker e sua conexão."
-        )
+        # extrai serie do índice baixado separadamente
+        if isinstance(raw_index.columns, pd.MultiIndex):
+            idx_close = raw_index["Close"]
+        else:
+            idx_close = raw_index[["Close"]].rename(columns={"Close": index_ticker})
+        idx_close = _clean(idx_close)
+        if index_ticker in idx_close.columns:
+            index_series = idx_close[index_ticker].rename(index_ticker)
+        elif len(idx_close.columns) > 0:
+            index_series = idx_close.iloc[:, 0].rename(index_ticker)
+        else:
+            raise ValueError(
+                f"Índice '{index_ticker}' não encontrado nos dados baixados. "
+                "Verifique o ticker e sua conexão."
+            )
+        prices = close
 
     # Remove ativos sem dados suficientes (< 30 pregões)
     prices = prices.loc[:, prices.count() >= 30]
