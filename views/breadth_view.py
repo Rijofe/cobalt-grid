@@ -34,14 +34,18 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
         _gauge(breadth.get("breadth_score", 0))
         pct_up   = breadth.get("pct_up",   0)
         pct_down = breadth.get("pct_down", 0)
+        pct_neut = breadth.get("pct_neut", 0)
+        n_up   = breadth.get("up",   0)
+        n_neut = breadth.get("neut", 0)
+        n_down = breadth.get("down", 0)
         indice_curto = indice_nome.split("—")[0].strip() if "—" in indice_nome else indice_nome.split("(")[0].strip()
         st.caption(
             f"**Breadth Score = % Acima − % Abaixo** "
-            f"= {pct_up:.1f}% − {pct_down:.1f}% = **{pct_up - pct_down:+.1f}**  "
+            f"= {pct_up:.1f}% − {pct_down:.1f}% = **{pct_up - pct_down:+.1f}** "
             f"· Varia de −100 (todos abaixo) a +100 (todos acima)  \n"
-            f"Acima (Q7-Q9): RS Ratio > +0.5σ vs {indice_curto} · "
-            f"Neutro (Q4-Q6): entre −0.5σ e +0.5σ vs {indice_curto} · "
-            f"Abaixo (Q1-Q3): RS Ratio < −0.5σ vs {indice_curto}"
+            f"Acima (Q7-Q9): RS Ratio > +0.5σ vs {indice_curto} — {n_up} ativos ({pct_up:.1f}%)  \n"
+            f"Neutro (Q4-Q6): entre −0.5σ e +0.5σ vs {indice_curto} — {n_neut} ativos ({pct_neut:.1f}%)  \n"
+            f"Abaixo (Q1-Q3): RS Ratio < −0.5σ vs {indice_curto} — {n_down} ativos ({pct_down:.1f}%)"
         )
 
     with col_idx:
