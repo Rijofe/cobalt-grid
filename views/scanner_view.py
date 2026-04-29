@@ -212,9 +212,16 @@ def _scan(df, prices, index_series, tickers_dict, janela,
     if not rows:
         return pd.DataFrame()
 
-    return pd.DataFrame(rows).drop_duplicates(
+    df_result = pd.DataFrame(rows).drop_duplicates(
         subset=["ticker", "de", "para"]
     ).reset_index(drop=True)
+    # Mantém apenas a transição mais recente por ticker
+    df_result = (
+        df_result.sort_values("dias_atrás")
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .reset_index(drop=True)
+    )
+    return df_result
 
 
 def _render_table(subset: pd.DataFrame, indice_nome: str):
