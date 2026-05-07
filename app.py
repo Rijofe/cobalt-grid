@@ -159,6 +159,10 @@ else:
     tickers_dict = UNIVERSOS.get(universo, {})
 tickers_list = list(tickers_dict.keys())
 
+# Aguarda upload antes de tentar carregar dados
+if universo == OPCAO_UPLOAD and not tickers_list:
+    st.stop()
+
 with st.spinner("Baixando preços..."):
     try:
         prices, index_series, index_volume_last, index_series_full = load_prices(tickers_list, indice_ticker)
