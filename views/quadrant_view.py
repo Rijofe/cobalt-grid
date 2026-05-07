@@ -66,9 +66,9 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
     # Label do eixo horizontal (Momentum) — acima da grade
     grid_html = (
-        "<div style='text-align:center;font-size:11px;font-weight:600;"
-        "color:#aaa;letter-spacing:.06em;text-transform:uppercase;"
-        "margin-bottom:2px;padding-left:46px'>— Momentum —</div>"
+        "<div style='text-align:center;font-size:13px;font-weight:700;"
+        "color:#ccc;letter-spacing:.06em;text-transform:uppercase;"
+        "margin-bottom:4px;padding-left:46px'>— Momentum —</div>"
     )
 
     # Grade principal
@@ -81,19 +81,25 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     grid_html += "<div></div>"
     for lbl in COL_LABELS:
         grid_html += (
-            f"<div style='text-align:center;font-size:12px;font-weight:500;"
-            f"color:#888;padding:3px 0'>{lbl}</div>"
+            f"<div style='text-align:center;font-size:13px;font-weight:600;"
+            f"color:#bbb;padding:3px 0'>{lbl}</div>"
         )
 
     row_colors = ["#3B6D11", "#854F0B", "#A32D2D"]
     for row_idx, quad_row in enumerate(GRID_LAYOUT):
-        # Label lateral: inclui nome do eixo 'RS' na primeira linha
-        axis_label = "RS &nbsp;" if row_idx == 0 else ""
+        # Label lateral com eixo RS centralizado acima dos labels de linha
+        axis_label_html = (
+            "<span style='font-size:12px;font-weight:700;color:#ccc;"
+            "letter-spacing:.08em;text-transform:uppercase;"
+            "display:block;margin-bottom:8px'>— RS Ratio —</span>"
+            if row_idx == 0 else ""
+        )
         grid_html += (
-            f"<div style='display:flex;align-items:center;justify-content:center;"
-            f"font-size:12px;font-weight:500;color:{row_colors[row_idx]};"
-            f"writing-mode:vertical-rl;transform:rotate(180deg)'>"
-            f"{axis_label}{ROW_LABELS[row_idx]}</div>"
+            f"<div style='display:flex;flex-direction:column;align-items:center;"
+            f"justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg)'>"
+            f"{axis_label_html}"
+            f"<span style='font-size:13px;font-weight:600;color:{row_colors[row_idx]}'>"
+            f"{ROW_LABELS[row_idx]}</span></div>"
         )
         for q in quad_row:
             style  = QUAD_STYLE[q]
