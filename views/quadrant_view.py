@@ -17,8 +17,8 @@ QUAD_STYLE = {
 }
 
 GRID_LAYOUT = [[7, 8, 9], [4, 5, 6], [1, 2, 3]]
-ROW_LABELS  = ["↑ RS > +0.5σ", "→ RS ±0.5σ", "↓ RS < -0.5σ"]
-COL_LABELS  = ["← Momentum < -0.5σ", "Momentum ±0.5σ", "Momentum > +0.5σ ↗"]
+ROW_LABELS  = ["↑ Acima (> +0.5σ)", "→ Neutro (±0.5σ)", "↓ Abaixo (< -0.5σ)"]
+COL_LABELS  = ["← Perdendo força (< -0.5σ)", "Estável (±0.5σ)", "Acelerando ↗ (> +0.5σ)"]
 
 METRIC_HELP = {
     "Breadth Score":    "Varia de −100 a +100. Calcula (% acima − % abaixo). Positivo = mercado favorece os líderes.",
@@ -63,12 +63,21 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
     # ── Grade HTML com chips clicáveis via query_params ───────
     chips_js = []   # lista de (ticker_sem_sa, ticker_completo)
+
+    # Label do eixo horizontal (Momentum) — acima da grade
     grid_html = (
+        "<div style='text-align:center;font-size:11px;font-weight:600;"
+        "color:#aaa;letter-spacing:.06em;text-transform:uppercase;"
+        "margin-bottom:2px;padding-left:46px'>— Momentum —</div>"
+    )
+
+    # Grade principal
+    grid_html += (
         "<div style='display:grid;grid-template-columns:40px repeat(3,1fr);"
         "gap:6px;align-items:stretch'>"
     )
 
-    # Cabeçalhos
+    # Cabeçalhos de coluna
     grid_html += "<div></div>"
     for lbl in COL_LABELS:
         grid_html += (
@@ -78,11 +87,13 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
     row_colors = ["#3B6D11", "#854F0B", "#A32D2D"]
     for row_idx, quad_row in enumerate(GRID_LAYOUT):
+        # Label lateral: inclui nome do eixo 'RS' na primeira linha
+        axis_label = "RS &nbsp;" if row_idx == 0 else ""
         grid_html += (
             f"<div style='display:flex;align-items:center;justify-content:center;"
             f"font-size:12px;font-weight:500;color:{row_colors[row_idx]};"
             f"writing-mode:vertical-rl;transform:rotate(180deg)'>"
-            f"{ROW_LABELS[row_idx]}</div>"
+            f"{axis_label}{ROW_LABELS[row_idx]}</div>"
         )
         for q in quad_row:
             style  = QUAD_STYLE[q]
