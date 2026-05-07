@@ -88,17 +88,21 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     row_colors = ["#3B6D11", "#854F0B", "#A32D2D"]
     for row_idx, quad_row in enumerate(GRID_LAYOUT):
         # Label lateral com eixo RS centralizado acima dos labels de linha
-        axis_label_html = (
-            "<span style='font-size:12px;font-weight:700;color:#ccc;"
-            "letter-spacing:.08em;text-transform:uppercase;"
-            "display:block;margin-bottom:8px'>— RS Ratio —</span>"
+        # Div lateral: dois elementos empilhados verticalmente
+        # O writing-mode fica só no span do label, não no container
+        axis_rs = (
+            "<span style='font-size:11px;font-weight:700;color:#ccc;"
+            "letter-spacing:.07em;text-transform:uppercase;"
+            "writing-mode:vertical-rl;transform:rotate(180deg);"
+            "margin-bottom:10px'>— RS Ratio —</span>"
             if row_idx == 0 else ""
         )
         grid_html += (
             f"<div style='display:flex;flex-direction:column;align-items:center;"
-            f"justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg)'>"
-            f"{axis_label_html}"
-            f"<span style='font-size:13px;font-weight:600;color:{row_colors[row_idx]}'>"
+            f"justify-content:center;height:100%'>"
+            f"{axis_rs}"
+            f"<span style='font-size:13px;font-weight:600;color:{row_colors[row_idx]};"
+            f"writing-mode:vertical-rl;transform:rotate(180deg)'>"
             f"{ROW_LABELS[row_idx]}</span></div>"
         )
         for q in quad_row:
