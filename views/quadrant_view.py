@@ -17,8 +17,8 @@ QUAD_STYLE = {
 }
 
 GRID_LAYOUT = [[7, 8, 9], [4, 5, 6], [1, 2, 3]]
-ROW_LABELS  = ["↑ Acima", "→ Neutro", "↓ Abaixo"]
-COL_LABELS  = ["← Perdendo força", "Estável", "Acelerando ↗"]
+ROW_LABELS  = ["↑ RS > +0.5σ", "→ RS ±0.5σ", "↓ RS < -0.5σ"]
+COL_LABELS  = ["← Momentum < -0.5σ", "Momentum ±0.5σ", "Momentum > +0.5σ ↗"]
 
 METRIC_HELP = {
     "Breadth Score":    "Varia de −100 a +100. Calcula (% acima − % abaixo). Positivo = mercado favorece os líderes.",
