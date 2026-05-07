@@ -56,6 +56,7 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     st.caption(
         "**Breadth Score** = (acima − abaixo) / total × 100  ·  "
         "**RS Ratio** = z-score do ratio preço/índice  ·  "
+        "📅 Janela fixa: 252 pregões (~1 ano)  ·  "
         "Passe o mouse nos valores para mais detalhes."
     )
 
@@ -70,6 +71,17 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
         "color:#ccc;letter-spacing:.06em;text-transform:uppercase;"
         "margin-bottom:4px;padding-left:46px'>— Momentum —</div>"
     )
+
+    # Wrapper externo: label RS Ratio vertical à esquerda + grade à direita
+    grid_html += "<div style='display:flex;align-items:stretch;gap:0'>"
+    grid_html += (
+        "<div style='display:flex;align-items:center;justify-content:center;"
+        "writing-mode:vertical-rl;transform:rotate(180deg);"
+        "font-size:12px;font-weight:700;color:#ccc;"
+        "letter-spacing:.07em;text-transform:uppercase;"
+        "padding-right:6px;white-space:nowrap'>— RS Ratio —</div>"
+    )
+    grid_html += "<div style='flex:1'>"
 
     # Grade principal
     grid_html += (
@@ -88,22 +100,11 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
     row_colors = ["#3B6D11", "#854F0B", "#A32D2D"]
     for row_idx, quad_row in enumerate(GRID_LAYOUT):
         # Label lateral com eixo RS centralizado acima dos labels de linha
-        # Div lateral: dois elementos empilhados verticalmente
-        # O writing-mode fica só no span do label, não no container
-        axis_rs = (
-            "<span style='font-size:11px;font-weight:700;color:#ccc;"
-            "letter-spacing:.07em;text-transform:uppercase;"
-            "writing-mode:vertical-rl;transform:rotate(180deg);"
-            "margin-bottom:10px'>— RS Ratio —</span>"
-            if row_idx == 0 else ""
-        )
         grid_html += (
-            f"<div style='display:flex;flex-direction:column;align-items:center;"
-            f"justify-content:center;height:100%'>"
-            f"{axis_rs}"
-            f"<span style='font-size:13px;font-weight:600;color:{row_colors[row_idx]};"
+            f"<div style='display:flex;align-items:center;justify-content:center;"
+            f"font-size:13px;font-weight:600;color:{row_colors[row_idx]};"
             f"writing-mode:vertical-rl;transform:rotate(180deg)'>"
-            f"{ROW_LABELS[row_idx]}</span></div>"
+            f"{ROW_LABELS[row_idx]}</div>"
         )
         for q in quad_row:
             style  = QUAD_STYLE[q]
@@ -146,7 +147,9 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
                 f"</div>"
             )
 
-    grid_html += "</div>"
+    grid_html += "</div>"  # fecha grid
+    grid_html += "</div>"  # fecha div flex:1
+    grid_html += "</div>"  # fecha wrapper RS Ratio
 
     # JS: clique no chip → atualiza URL query param → Streamlit reroda
     js = """
