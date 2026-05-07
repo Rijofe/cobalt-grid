@@ -161,6 +161,12 @@ tickers_list = list(tickers_dict.keys())
 
 # Aguarda upload antes de tentar carregar dados
 if universo == OPCAO_UPLOAD and not tickers_list:
+    st.markdown(
+        "<p style='font-size:18px;color:#ccc;margin-top:40px;text-align:center'>"
+        "⬅ Baixe o modelo do CSV à esquerda e faça upload do arquivo com seus ativos."
+        "</p>",
+        unsafe_allow_html=True,
+    )
     st.stop()
 
 with st.spinner("Baixando preços..."):
