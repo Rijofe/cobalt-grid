@@ -58,7 +58,12 @@ def carrega_csv(source) -> dict[str, str]:
             df = pd.read_csv(source, dtype=str, encoding="utf-8-sig", sep=None, engine="python")
         else:
             # Upload do Streamlit (UploadedFile ou bytes)
+            # seek(0) garante leitura do início mesmo após re-renders
+            if hasattr(source, "seek"):
+                source.seek(0)
             content = source.read() if hasattr(source, "read") else source
+            if not content:
+                raise ValueError("Arquivo vazio ou já consumido.")
             df = pd.read_csv(io.BytesIO(content), dtype=str, encoding="utf-8-sig", sep=None, engine="python")
 
         df.columns = [c.strip().lower() for c in df.columns]
@@ -84,7 +89,8 @@ def carrega_csv(source) -> dict[str, str]:
         return resultado
 
     except Exception as e:
-        return {}
+        # Propaga o erro para que o app.py possa exibi-lo ao usuário
+        raise RuntimeError(f"Erro ao ler CSV: {e}") from e
 
 
 def gera_exemplo_csv() -> bytes:

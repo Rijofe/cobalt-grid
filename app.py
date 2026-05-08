@@ -67,8 +67,15 @@ with st.sidebar:
             mime="text/csv",
         )
         if uploaded:
-            tickers_csv = carrega_csv(uploaded)
-            st.caption(f"{len(tickers_csv)} ativos carregados")
+            try:
+                tickers_csv = carrega_csv(uploaded)
+                if tickers_csv:
+                    st.caption(f"{len(tickers_csv)} ativos carregados")
+                else:
+                    st.warning("CSV lido mas nenhum ticker encontrado. Verifique o formato.")
+            except Exception as e:
+                st.error(f"Erro ao ler CSV: {e}")
+                tickers_csv = None
         else:
             st.info("Selecione um arquivo CSV para carregar.")
 
