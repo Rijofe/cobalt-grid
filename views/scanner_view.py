@@ -96,26 +96,31 @@ def render(df, prices, index_series, indice_nome, tickers_dict,
         """)
 
     st.markdown("""
-<div style=\"display:flex; gap:24px; margin: 8px 0 4px 0; flex-wrap:wrap;\">
-  <div style=\"display:flex; align-items:center; gap:6px;\">
-    <span style=\"font-size:18px;\">&#128260;</span>
-    <div>
-      <span style=\"font-weight:600;\">Recupera&#231;&#227;o</span>
-      <span style=\"color:#888; font-size:12px; margin-left:4px;\">Q1&#8594;Q2 &middot; Q2&#8594;Q3 &middot; Q3&#8594;Q6</span>
+<div style=\"margin: 8px 0 4px 0;\">
+  <div style=\"display:flex; gap:24px; flex-wrap:wrap; margin-bottom:6px;\">
+    <div style=\"display:flex; align-items:flex-start; gap:6px;\">
+      <span style=\"font-size:16px; margin-top:1px;\">&#128640;</span>
+      <div>
+        <span style=\"font-weight:700;\">1&#186; Entrada</span>
+        <span style=\"background:#1a3a1a; color:#4CAF50; font-size:11px; padding:1px 6px; border-radius:4px; margin-left:4px;\">melhor risco/retorno</span><br>
+        <span style=\"color:#888; font-size:11px;\">Q6&#8594;Q9 &middot; Q4&#8594;Q7 &middot; Q4&#8594;Q6 &middot; Q5&#8594;Q6 &middot; Q5&#8594;Q8 &mdash; RS confirmado, acelerando</span>
+      </div>
     </div>
-  </div>
-  <div style=\"display:flex; align-items:center; gap:6px;\">
-    <span style=\"font-size:18px;\">&#128640;</span>
-    <div>
-      <span style=\"font-weight:600;\">Entrada</span>
-      <span style=\"color:#888; font-size:12px; margin-left:4px;\">Q6&#8594;Q9 &middot; Q4&#8594;Q7 &middot; Q4&#8594;Q6 &middot; Q5&#8594;Q6 &middot; Q5&#8594;Q8</span>
+    <div style=\"display:flex; align-items:flex-start; gap:6px;\">
+      <span style=\"font-size:16px; margin-top:1px;\">&#128260;</span>
+      <div>
+        <span style=\"font-weight:700;\">2&#186; Recupera&#231;&#227;o</span>
+        <span style=\"background:#2a2a0a; color:#EF9F27; font-size:11px; padding:1px 6px; border-radius:4px; margin-left:4px;\">antecipa&#231;&#227;o + confirma&#231;&#227;o</span><br>
+        <span style=\"color:#888; font-size:11px;\">Q1&#8594;Q2 &middot; Q2&#8594;Q3 &middot; Q3&#8594;Q6 &mdash; RS ainda negativo, aguardar confirma&#231;&#227;o</span>
+      </div>
     </div>
-  </div>
-  <div style=\"display:flex; align-items:center; gap:6px;\">
-    <span style=\"font-size:18px;\">&#9989;</span>
-    <div>
-      <span style=\"font-weight:600;\">Continua&#231;&#227;o</span>
-      <span style=\"color:#888; font-size:12px; margin-left:4px;\">Q7&#8594;Q8 &middot; Q8&#8594;Q9</span>
+    <div style=\"display:flex; align-items:flex-start; gap:6px;\">
+      <span style=\"font-size:16px; margin-top:1px;\">&#9989;</span>
+      <div>
+        <span style=\"font-weight:700;\">Continua&#231;&#227;o</span>
+        <span style=\"background:#1a1a2a; color:#888; font-size:11px; padding:1px 6px; border-radius:4px; margin-left:4px;\">gest&#227;o de posi&#231;&#227;o</span><br>
+        <span style=\"color:#888; font-size:11px;\">Q7&#8594;Q8 &middot; Q8&#8594;Q9 &mdash; n&#227;o &#233; entrada, confirma manuten&#231;&#227;o da posi&#231;&#227;o</span>
+      </div>
     </div>
   </div>
 </div>
