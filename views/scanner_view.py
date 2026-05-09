@@ -9,16 +9,22 @@ import streamlit as st
 import pandas as pd
 from engine.rs_calc import compute_quadrant_history
 
-# Transições relevantes
+# ── Tipo de sinal de compra ───────────────────────────────────
+# Cada transição tem: (label_tabela, tipo_sinal)
+# tipo_sinal: "recuperacao" | "entrada" | "continuacao"
+
 BUY_TRANSITIONS = {
-    (1, 2): "Q1→Q2 — Estabilizando",
-    (2, 3): "Q2→Q3 — Início de recuperação",
-    (3, 6): "Q3→Q6 — Confirmação de rotação",
-    (6, 9): "Q6→Q9 — Entrada na liderança ★",
-    (4, 6): "Q4→Q6 — Neutro acelerando",
-    (5, 6): "Q5→Q6 — Saindo do neutro para cima",
-    (5, 8): "Q5→Q8 — Cruzou para acima estável",
-    (3, 9): "Q3→Q9 — Salto direto (evento)",
+    (1, 2): ("Q1→Q2 — Estabilizando",          "recuperacao"),
+    (2, 3): ("Q2→Q3 — Início de recuperação",   "recuperacao"),
+    (3, 6): ("Q3→Q6 — Confirmação de rotação",  "recuperacao"),
+    (6, 9): ("Q6→Q9 — Entrada na liderança ★",  "entrada"),
+    (4, 7): ("Q4→Q7 — Neutro direto à força",   "entrada"),
+    (4, 6): ("Q4→Q6 — Neutro acelerando",        "entrada"),
+    (5, 6): ("Q5→Q6 — Saindo do neutro para cima", "entrada"),
+    (5, 8): ("Q5→Q8 — Cruzou para acima estável",  "entrada"),
+    (3, 9): ("Q3→Q9 — Salto direto (evento)",   "entrada"),
+    (7, 8): ("Q7→Q8 — Acelerando na liderança", "continuacao"),
+    (8, 9): ("Q8→Q9 — Consolidando liderança ★","continuacao"),
 }
 
 SELL_TRANSITIONS = {
@@ -30,6 +36,12 @@ SELL_TRANSITIONS = {
     (6, 4): "Q6→Q4 — Neutro desacelerando",
     (5, 4): "Q5→Q4 — Saindo do neutro para baixo",
     (5, 2): "Q5→Q2 — Cruzou para abaixo estável",
+}
+
+TIPO_SINAL_LABEL = {
+    "recuperacao": "🔄 Recuperação",
+    "entrada":     "🚀 Entrada",
+    "continuacao": "✅ Continuação",
 }
 
 QUAD_COLORS = {
@@ -81,12 +93,39 @@ def render(df, prices, index_series, indice_nome, tickers_dict,
 - Classifica cada transição como sinal de **compra** (rotação positiva) ou **venda** (rotação negativa)
 - Ordena pela recência — transições de hoje aparecem primeiro em **verde**
 
-**Sinais de compra monitorados:** Q1→Q2, Q2→Q3, Q3→Q6, Q6→Q9 e variações
+**Sinais de compra monitorados:** Q1→Q2, Q2→Q3, Q3→Q6, Q6→Q9, Q4→Q7, Q7→Q8, Q8→Q9 e variações
 
 **Sinais de venda monitorados:** Q9→Q8, Q8→Q7, Q7→Q4, Q4→Q1 e variações
 
 **Dica:** use janela de 5 dias para ver o que mudou essa semana. Use 21 dias para contexto mais amplo.
         """)
+
+    # ── Legenda de tipos de sinal ──────────────────────────────
+    st.markdown("""
+<div style="display:flex; gap:24px; margin: 8px 0 4px 0; flex-wrap:wrap;">
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="font-size:18px;">🔄</span>
+    <div>
+      <span style="font-weight:600;">Recuperação</span>
+      <span style="color:#888; font-size:12px; margin-left:4px;">Q1→Q2 · Q2→Q3 · Q3→Q6</span>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="font-size:18px;">🚀</span>
+    <div>
+      <span style="font-weight:600;">Entrada</span>
+      <span style="color:#888; font-size:12px; margin-left:4px;">Q6→Q9 · Q4→Q7 · Q4→Q6 · Q5→Q6 · Q5→Q8</span>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="font-size:18px;">✅</span>
+    <div>
+      <span style="font-weight:600;">Continuação</span>
+      <span style="color:#888; font-size:12px; margin-left:4px;">Q7→Q8 · Q8→Q9</span>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
     st.divider()
 
@@ -135,11 +174,11 @@ def render(df, prices, index_series, indice_nome, tickers_dict,
 
     if not compras.empty and "Venda" not in tipo:
         st.markdown("#### 🟢 Sinais de compra")
-        _render_table(compras, indice_nome)
+        _render_table(compras, indice_nome, is_compra=True)
 
     if not vendas.empty and "Compra" not in tipo:
         st.markdown("#### 🔴 Sinais de venda")
-        _render_table(vendas, indice_nome)
+        _render_table(vendas, indice_nome, is_compra=False)
 
 
 # ── Lógica de varredura ───────────────────────────────────────
@@ -185,28 +224,31 @@ def _scan(df, prices, index_series, tickers_dict, janela,
             mom_atual = float(df[df["ticker"] == ticker]["rs_mom"].iloc[0])
 
             if par in BUY_TRANSITIONS:
+                label, tipo_sinal = BUY_TRANSITIONS[par]
                 rows.append({
-                    "tipo":       "compra",
-                    "ticker":     ticker.replace(".SA", ""),
-                    "nome":       nome,
-                    "transição":  BUY_TRANSITIONS[par],
-                    "de":         q_ant,
-                    "para":       q_now,
-                    "dias_atrás": dias_atras,
-                    "rs_atual":   rs_atual,
-                    "mom_atual":  mom_atual,
+                    "tipo":        "compra",
+                    "tipo_sinal":  TIPO_SINAL_LABEL[tipo_sinal],
+                    "ticker":      ticker.replace(".SA", ""),
+                    "nome":        nome,
+                    "transição":   label,
+                    "de":          q_ant,
+                    "para":        q_now,
+                    "dias_atrás":  dias_atras,
+                    "rs_atual":    rs_atual,
+                    "mom_atual":   mom_atual,
                 })
             elif par in SELL_TRANSITIONS:
                 rows.append({
-                    "tipo":       "venda",
-                    "ticker":     ticker.replace(".SA", ""),
-                    "nome":       nome,
-                    "transição":  SELL_TRANSITIONS[par],
-                    "de":         q_ant,
-                    "para":       q_now,
-                    "dias_atrás": dias_atras,
-                    "rs_atual":   rs_atual,
-                    "mom_atual":  mom_atual,
+                    "tipo":        "venda",
+                    "tipo_sinal":  "—",
+                    "ticker":      ticker.replace(".SA", ""),
+                    "nome":        nome,
+                    "transição":   SELL_TRANSITIONS[par],
+                    "de":          q_ant,
+                    "para":        q_now,
+                    "dias_atrás":  dias_atras,
+                    "rs_atual":    rs_atual,
+                    "mom_atual":   mom_atual,
                 })
 
     if not rows:
@@ -224,14 +266,19 @@ def _scan(df, prices, index_series, tickers_dict, janela,
     return df_result
 
 
-def _render_table(subset: pd.DataFrame, indice_nome: str):
+def _render_table(subset: pd.DataFrame, indice_nome: str, is_compra: bool = True):
     if subset.empty:
         return
 
-    display = subset[["ticker", "nome", "transição", "dias_atrás",
-                       "rs_atual", "mom_atual"]].copy()
-    display.columns = ["Ticker", "Nome", "Transição",
-                        "Dias atrás", "RS atual (σ)", "Mom atual (σ)"]
+    if is_compra:
+        cols_sel = ["ticker", "nome", "transição", "tipo_sinal", "dias_atrás", "rs_atual", "mom_atual"]
+        col_names = ["Ticker", "Nome", "Transição", "Tipo de sinal", "Dias atrás", "RS atual (σ)", "Mom atual (σ)"]
+    else:
+        cols_sel = ["ticker", "nome", "transição", "dias_atrás", "rs_atual", "mom_atual"]
+        col_names = ["Ticker", "Nome", "Transição", "Dias atrás", "RS atual (σ)", "Mom atual (σ)"]
+
+    display = subset[cols_sel].copy()
+    display.columns = col_names
 
     def color_rs(val):
         try:
