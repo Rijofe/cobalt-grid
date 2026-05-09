@@ -366,27 +366,6 @@ UNIVERSOS: dict[str, dict[str, str]] = {
         "VNM":   "Vietnam ETF",
         "EWT":   "Taiwan ETF",
     },
-}
-
-
-def get_tickers(universo: str) -> dict[str, str]:
-    """Retorna dicionário {ticker: nome} do universo selecionado."""
-    return UNIVERSOS.get(universo, {})
-
-
-def get_ticker_list(universo: str) -> list[str]:
-    """Retorna apenas a lista de tickers (sem nomes)."""
-    return list(UNIVERSOS.get(universo, {}).keys())
-
-
-def get_nome(universo: str, ticker: str) -> str:
-    """Retorna o nome legível de um ticker."""
-    return UNIVERSOS.get(universo, {}).get(ticker, ticker)
-
-# ── Mapeamento de setores por ticker ─────────────────────────
-# Usado pelo slide de Análise Setorial.
-# Formato: { "TICKER.SA": "Setor" }
-
     # ETFs Brasileiros -- 111 fundos listados na B3
     # Fonte: B3 (mai/2026).
     "ETFs Brasileiros": {
@@ -502,6 +481,27 @@ def get_nome(universo: str, ticker: str) -> str:
         "XINA11.SA": "XINA - Bloomberg China Trend",
         "YDRO11.SA": "YDRO - S&P Kensho Hydrogen",
     },
+
+}
+
+
+def get_tickers(universo: str) -> dict[str, str]:
+    """Retorna dicionário {ticker: nome} do universo selecionado."""
+    return UNIVERSOS.get(universo, {})
+
+
+def get_ticker_list(universo: str) -> list[str]:
+    """Retorna apenas a lista de tickers (sem nomes)."""
+    return list(UNIVERSOS.get(universo, {}).keys())
+
+
+def get_nome(universo: str, ticker: str) -> str:
+    """Retorna o nome legível de um ticker."""
+    return UNIVERSOS.get(universo, {}).get(ticker, ticker)
+
+# ── Mapeamento de setores por ticker ─────────────────────────
+# Usado pelo slide de Análise Setorial.
+# Formato: { "TICKER.SA": "Setor" }
 
 SETORES: dict[str, str] = {
     # Ibovespa
