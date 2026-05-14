@@ -1,11 +1,9 @@
 # engine/loader.py
 # ------------------------------------------------------------
 # Responsabilidade: baixar preços de fechamento ajustados via
-# yfinance (principal) com fallback para brapi.dev (BDRs sem
-# dados no Yahoo). Devolve DataFrames limpos com cache Streamlit.
+# yfinance e devolver DataFrames limpos com cache do Streamlit.
 # ------------------------------------------------------------
 
-import requests
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -13,9 +11,8 @@ from datetime import datetime, timedelta
 
 
 # ── Constantes ───────────────────────────────────────────────
-LOOKBACK_DAYS   = 400   # dias corridos para cobrir ~252 pregões + folga
-MAX_RETRIES     = 2     # tentativas em caso de falha de rede
-BRAPI_BASE_URL  = "https://brapi.dev/api/quote"
+LOOKBACK_DAYS = 400   # dias corridos para cobrir ~252 pregões + folga
+MAX_RETRIES   = 2     # tentativas em caso de falha de rede
 
 # Ticker virtual para IBOV dolarizado (calculado internamente)
 IBOV_USD_TICKER = "__IBOV_USD__"
@@ -31,7 +28,6 @@ def load_prices(
 ) -> tuple[pd.DataFrame, pd.Series, float, pd.Series]:
     """
     Baixa preços de fechamento ajustados para os ativos e para o índice.
-    Tenta Yahoo Finance primeiro; para ativos sem dados usa brapi como fallback.
 
     Parâmetros
     ----------
@@ -43,8 +39,8 @@ def load_prices(
     -------
     prices            : DataFrame shape=(dias, n_ativos)
     index_series      : Series shape=(dias,)
-    index_volume_last : float — volume do último dia do índice
-    index_series_full : Series — série completa do índice (para YTD)
+    index_volume_last : float
+    index_series_full : Series — série completa para YTD
     """
     end   = datetime.today()
     start = end - timedelta(days=lookback_days)
@@ -76,16 +72,6 @@ def load_prices(
 
     close = _clean(close)
 
-    # Fallback brapi para ativos sem dados no Yahoo
-    tickers_sem_dados = [t for t in tickers_set if t not in close.columns or close[t].count() < 30]
-    if tickers_sem_dados:
-        brapi_close = _download_brapi_batch(tickers_sem_dados, start, end)
-        if not brapi_close.empty:
-            # Alinha índice de datas e mescla
-            close = close.reindex(close.index.union(brapi_close.index)).ffill()
-            for col in brapi_close.columns:
-                close[col] = brapi_close[col]
-
     # Separa índice dos ativos
     if index_ticker == IBOV_USD_TICKER:
         index_series = ibov_usd
@@ -110,7 +96,7 @@ def load_prices(
     # Remove ativos sem dados suficientes (< 30 pregões)
     prices = prices.loc[:, prices.count() >= 30]
 
-    # Garante datas em comum suficientes entre ativos e índice
+    # Garante que índice e ativos têm datas em comum suficientes
     common = prices.index.intersection(index_series.dropna().index)
     if len(common) < 30:
         raise ValueError(
@@ -206,66 +192,6 @@ def _download(tickers: list[str], start: datetime, end: datetime) -> pd.DataFram
                     f"Erro: {e}"
                 )
     return pd.DataFrame()
-
-
-def _get_brapi_token() -> str | None:
-    """Lê o token da brapi do secrets.toml ou retorna None."""
-    try:
-        return st.secrets.get("BRAPI_TOKEN", None)
-    except Exception:
-        return None
-
-
-def _download_brapi_single(ticker_sa: str, start: datetime, end: datetime) -> pd.Series:
-    """
-    Baixa série histórica de um ticker via brapi.dev.
-    ticker_sa: formato 'BDVE39.SA' — remove o .SA para a chamada.
-    Retorna Series com índice DatetimeIndex ou Series vazia.
-    """
-    token = _get_brapi_token()
-    if not token:
-        return pd.Series(dtype=float)
-
-    ticker = ticker_sa.replace(".SA", "")
-    url    = f"{BRAPI_BASE_URL}/{ticker}"
-    params = {
-        "range":    "1y",
-        "interval": "1d",
-        "token":    token,
-    }
-
-    try:
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-
-        hist = data.get("results", [{}])[0].get("historicalDataPrice", [])
-        if not hist:
-            return pd.Series(dtype=float)
-
-        df = pd.DataFrame(hist)
-        df["date"] = pd.to_datetime(df["date"], unit="s", utc=True).dt.tz_convert("America/Sao_Paulo").dt.normalize()
-        df = df.set_index("date")[["close"]].rename(columns={"close": ticker_sa})
-        df = df[df.index >= pd.Timestamp(start).tz_localize("America/Sao_Paulo")]
-        df = df.sort_index()
-        return df[ticker_sa]
-
-    except Exception:
-        return pd.Series(dtype=float)
-
-
-def _download_brapi_batch(tickers_sa: list[str], start: datetime, end: datetime) -> pd.DataFrame:
-    """Baixa múltiplos tickers via brapi e retorna DataFrame consolidado."""
-    frames = {}
-    for ticker in tickers_sa:
-        s = _download_brapi_single(ticker, start, end)
-        if not s.empty and s.count() >= 30:
-            frames[ticker] = s
-
-    if not frames:
-        return pd.DataFrame()
-
-    return pd.DataFrame(frames)
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
