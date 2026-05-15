@@ -24,6 +24,7 @@ INDICES = {
     "Total World — Vanguard (VT)":    "VT",
     "IBOV Dolarizado (^BVSP/USD)":    "__IBOV_USD__",
     "IPCA Proxy (IMAB11/LFTS11)":       "__IPCA_PROXY__",
+    "Selic — ETF LFTS11":               "LFTS11.SA",
     "S&P 500 em Reais (IVVB11)":      "IVVB11.SA",
 }
 
