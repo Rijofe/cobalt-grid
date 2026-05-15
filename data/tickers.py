@@ -23,6 +23,7 @@ INDICES = {
     "MSCI World (URTH)":              "URTH",
     "Total World — Vanguard (VT)":    "VT",
     "IBOV Dolarizado (^BVSP/USD)":    "__IBOV_USD__",
+    "IPCA Proxy (IMAB11/LFTS11)":       "__IPCA_PROXY__",
     "S&P 500 em Reais (IVVB11)":      "IVVB11.SA",
 }
 

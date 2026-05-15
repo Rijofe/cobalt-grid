@@ -14,8 +14,9 @@ from datetime import datetime, timedelta
 LOOKBACK_DAYS = 400   # dias corridos para cobrir ~252 pregões + folga
 MAX_RETRIES   = 2     # tentativas em caso de falha de rede
 
-# Ticker virtual para IBOV dolarizado (calculado internamente)
-IBOV_USD_TICKER = "__IBOV_USD__"
+# Tickers virtuais calculados internamente
+IBOV_USD_TICKER  = "__IBOV_USD__"
+IPCA_PROXY_TICKER = "__IPCA_PROXY__"  # IMAB11 / LFTS11 — proxy de inflação
 
 
 # ── Funções públicas ──────────────────────────────────────────
@@ -45,9 +46,12 @@ def load_prices(
     end   = datetime.today()
     start = end - timedelta(days=lookback_days)
 
-    # IBOV dolarizado: baixa ^BVSP e BRL=X separadamente
+    raw = _download(list(set(tickers)), start, end)
+
+    # ── Índices sintéticos ────────────────────────────────────
+
+    # IBOV dolarizado: ^BVSP / BRL=X
     if index_ticker == IBOV_USD_TICKER:
-        raw      = _download(list(set(tickers)), start, end)
         ibov_raw = _download(["^BVSP", "BRL=X"], start, end)
         if isinstance(ibov_raw.columns, pd.MultiIndex):
             bvsp = ibov_raw["Close"]["^BVSP"]
@@ -58,25 +62,25 @@ def load_prices(
         bvsp = _clean_series(bvsp)
         brl  = _clean_series(brl)
         common_fx = bvsp.index.intersection(brl.index)
-        ibov_usd  = (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
+        index_series = (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
+
+    # IPCA proxy: IMAB11 / LFTS11
+    elif index_ticker == IPCA_PROXY_TICKER:
+        proxy_raw = _download(["IMAB11.SA", "LFTS11.SA"], start, end)
+        if isinstance(proxy_raw.columns, pd.MultiIndex):
+            imab = proxy_raw["Close"]["IMAB11.SA"]
+            lfts = proxy_raw["Close"]["LFTS11.SA"]
+        else:
+            imab = proxy_raw["Close"]
+            lfts = proxy_raw["Close"]
+        imab = _clean_series(imab)
+        lfts = _clean_series(lfts)
+        common_px = imab.index.intersection(lfts.index)
+        index_series = (imab.loc[common_px] / lfts.loc[common_px]).rename(IPCA_PROXY_TICKER)
+
+    # ── Índice normal ─────────────────────────────────────────
     else:
-        raw       = _download(list(set(tickers)), start, end)
         raw_index = _download([index_ticker], start, end)
-
-    # Extrai coluna "Close" independente de versão do yfinance
-    tickers_set = list(set(tickers))
-    if isinstance(raw.columns, pd.MultiIndex):
-        close = raw["Close"]
-    else:
-        close = raw[["Close"]].rename(columns={"Close": tickers_set[0]})
-
-    close = _clean(close)
-
-    # Separa índice dos ativos
-    if index_ticker == IBOV_USD_TICKER:
-        index_series = ibov_usd
-        prices       = close
-    else:
         if isinstance(raw_index.columns, pd.MultiIndex):
             idx_close = raw_index["Close"]
         else:
@@ -91,12 +95,21 @@ def load_prices(
                 f"Índice '{index_ticker}' não encontrado nos dados baixados. "
                 "Verifique o ticker e sua conexão."
             )
-        prices = close
+
+    # ── Preços dos ativos ─────────────────────────────────────
+    tickers_set = list(set(tickers))
+    if isinstance(raw.columns, pd.MultiIndex):
+        close = raw["Close"]
+    else:
+        close = raw[["Close"]].rename(columns={"Close": tickers_set[0]})
+
+    close = _clean(close)
+    prices = close
 
     # Remove ativos sem dados suficientes (< 30 pregões)
     prices = prices.loc[:, prices.count() >= 30]
 
-    # Garante que índice e ativos têm datas em comum suficientes
+    # Garante datas em comum suficientes
     common = prices.index.intersection(index_series.dropna().index)
     if len(common) < 30:
         raise ValueError(
@@ -107,7 +120,7 @@ def load_prices(
     prices       = prices.reindex(common).ffill()
     index_series = index_series.reindex(common).ffill()
 
-    # Volume do último dia do índice (para detectar fechamento)
+    # Volume do último dia do índice
     try:
         if isinstance(raw.columns, pd.MultiIndex):
             if index_ticker in raw["Volume"].columns:
@@ -130,13 +143,38 @@ def load_index_only(index_ticker: str, lookback_days: int = LOOKBACK_DAYS) -> pd
     """
     end   = datetime.today()
     start = end - timedelta(days=lookback_days)
-    raw   = _download([index_ticker], start, end)
 
+    if index_ticker == IPCA_PROXY_TICKER:
+        proxy_raw = _download(["IMAB11.SA", "LFTS11.SA"], start, end)
+        if isinstance(proxy_raw.columns, pd.MultiIndex):
+            imab = proxy_raw["Close"]["IMAB11.SA"]
+            lfts = proxy_raw["Close"]["LFTS11.SA"]
+        else:
+            imab = proxy_raw["Close"]
+            lfts = proxy_raw["Close"]
+        imab = _clean_series(imab)
+        lfts = _clean_series(lfts)
+        common_px = imab.index.intersection(lfts.index)
+        return (imab.loc[common_px] / lfts.loc[common_px]).rename(IPCA_PROXY_TICKER)
+
+    if index_ticker == IBOV_USD_TICKER:
+        ibov_raw = _download(["^BVSP", "BRL=X"], start, end)
+        if isinstance(ibov_raw.columns, pd.MultiIndex):
+            bvsp = ibov_raw["Close"]["^BVSP"]
+            brl  = ibov_raw["Close"]["BRL=X"]
+        else:
+            bvsp = ibov_raw["Close"]
+            brl  = ibov_raw["Close"]
+        bvsp = _clean_series(bvsp)
+        brl  = _clean_series(brl)
+        common_fx = bvsp.index.intersection(brl.index)
+        return (bvsp.loc[common_fx] / brl.loc[common_fx]).rename(IBOV_USD_TICKER)
+
+    raw = _download([index_ticker], start, end)
     if isinstance(raw.columns, pd.MultiIndex):
         close = raw["Close"][index_ticker]
     else:
         close = raw["Close"]
-
     return _clean_series(close).rename(index_ticker)
 
 
