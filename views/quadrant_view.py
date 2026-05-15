@@ -39,6 +39,17 @@ def render(df, breadth, indice_nome, idx_perf, **kwargs):
 
     st.markdown(f"### Quadrantes — vs {indice_nome}")
 
+    # ── Aviso para universos com ETFs ─────────────────────────
+    universo = kwargs.get("universo", "")
+    universos_com_etfs = {"ETFs Brasileiros", "BDRs — ETFs", "ETFs Globais — Bolsas por Pais"}
+    if universo in universos_com_etfs:
+        st.warning(
+            "⚠️ Este universo contém ETFs. ETFs que replicam o índice de referência "
+            "selecionado podem apresentar RS distorcido — o ratio ETF/índice não é "
+            "exatamente 1.0 devido a dividendos, spread e defasagem de precificação.",
+            icon=None,
+        )
+
     # ── Métricas com legenda ──────────────────────────────────
     c1, c2, c3, c4, c5 = st.columns(5)
     score = breadth.get("breadth_score", 0)
