@@ -359,3 +359,4 @@ with st.sidebar:
                 file_name=f"{c['data_str']}_{c['label']}.pdf",
                 mime="application/pdf", key="dl_pdf",
             )
+
